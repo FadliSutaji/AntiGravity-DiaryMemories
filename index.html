@@ -19,57 +19,8 @@
     <!-- Floating particles -->
     <div class="particles" id="particles"></div>
 
-    <!-- ===== PIN LOCK SCREEN ===== -->
-    <div class="lock-screen" id="lockScreen">
-        <div class="lock-overlay"></div>
-        <div class="lock-content">
-            <div class="lock-icon">🔒</div>
-            <h2 class="lock-title">Ruang aku sayang km</h2>
-            <p class="lock-subtitle">Tebak beb</p>
-            <div class="pin-dots" id="pinDots">
-                <span class="pin-dot"></span>
-                <span class="pin-dot"></span>
-                <span class="pin-dot"></span>
-                <span class="pin-dot"></span>
-            </div>
-            <div class="pin-pad">
-                <button class="pin-key" data-key="1">1</button>
-                <button class="pin-key" data-key="2">2</button>
-                <button class="pin-key" data-key="3">3</button>
-                <button class="pin-key" data-key="4">4</button>
-                <button class="pin-key" data-key="5">5</button>
-                <button class="pin-key" data-key="6">6</button>
-                <button class="pin-key" data-key="7">7</button>
-                <button class="pin-key" data-key="8">8</button>
-                <button class="pin-key" data-key="9">9</button>
-                <button class="pin-key pin-key-empty"></button>
-                <button class="pin-key" data-key="0">0</button>
-                <button class="pin-key pin-key-del" data-key="del">⌫</button>
-            </div>
-            <p class="lock-hint" id="lockHint">PIN : Tanggal smm bulan</p>
-            <button class="btn btn-secondary btn-sm" id="changePinBtn">Rasah diganti yo</button>
-        </div>
-
-        <!-- Change PIN Modal -->
-        <div class="pin-change-modal" id="pinChangeModal" style="display:none;">
-            <div class="pin-change-card glass-card">
-                <h3>🔐 Ubah PIN</h3>
-                <input type="password" id="oldPin" class="pin-input" placeholder="PIN lama" maxlength="4"
-                    inputmode="numeric">
-                <input type="password" id="newPin" class="pin-input" placeholder="PIN baru (4 digit)" maxlength="4"
-                    inputmode="numeric">
-                <input type="password" id="confirmPin" class="pin-input" placeholder="Konfirmasi PIN baru" maxlength="4"
-                    inputmode="numeric">
-                <div class="form-actions">
-                    <button class="btn btn-secondary btn-sm" id="cancelPinChange">Batal</button>
-                    <button class="btn btn-primary btn-sm" id="savePinChange">Simpan</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- ===== MAIN APP (hidden until unlocked) ===== -->
-    <div class="app-wrapper" id="appWrapper" style="display:none;">
+    <!-- ===== MAIN APP ===== -->
+    <div class="app-wrapper" id="appWrapper">
 
         <!-- Background Music Player -->
         <div class="music-player" id="musicPlayer">

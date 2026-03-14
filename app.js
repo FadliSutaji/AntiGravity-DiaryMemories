@@ -6,10 +6,9 @@
 document.addEventListener('DOMContentLoaded', () => {
     initTheme();
     initParticles();
-    initPinLock();
+    initApp();
 });
 
-// Called after successful unlock
 function initApp() {
     initNavbar();
     initDate();
@@ -66,135 +65,6 @@ function initParticles() {
     }
 }
 
-/* ========================================
-   PIN LOCK
-   ======================================== */
-function initPinLock() {
-    const lockScreen = document.getElementById('lockScreen');
-    const appWrapper = document.getElementById('appWrapper');
-    const pinDots = document.querySelectorAll('.pin-dot');
-    const pinKeys = document.querySelectorAll('.pin-key[data-key]');
-    const changePinBtn = document.getElementById('changePinBtn');
-    const pinChangeModal = document.getElementById('pinChangeModal');
-    const cancelPinChange = document.getElementById('cancelPinChange');
-    const savePinChange = document.getElementById('savePinChange');
-
-    let enteredPin = '';
-    const defaultPin = '1711';
-
-    function getPin() {
-        return localStorage.getItem('diary_pin') || defaultPin;
-    }
-
-    function updateDots() {
-        pinDots.forEach((dot, i) => {
-            dot.classList.toggle('filled', i < enteredPin.length);
-            dot.classList.remove('error');
-        });
-    }
-
-    function unlockSuccess() {
-        lockScreen.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
-        lockScreen.style.opacity = '0';
-        lockScreen.style.transform = 'scale(1.05)';
-        setTimeout(() => {
-            lockScreen.style.display = 'none';
-            appWrapper.style.display = 'block';
-            appWrapper.style.opacity = '0';
-            appWrapper.style.transition = 'opacity 0.5s ease';
-            requestAnimationFrame(() => { appWrapper.style.opacity = '1'; });
-            initApp();
-        }, 500);
-    }
-
-    function pinError() {
-        pinDots.forEach(dot => dot.classList.add('error'));
-        setTimeout(() => {
-            enteredPin = '';
-            updateDots();
-        }, 600);
-    }
-
-    function handleKey(key) {
-        if (key === 'del') {
-            enteredPin = enteredPin.slice(0, -1);
-            updateDots();
-            return;
-        }
-        if (enteredPin.length >= 4) return;
-        enteredPin += key;
-        updateDots();
-
-        if (enteredPin.length === 4) {
-            setTimeout(() => {
-                if (enteredPin === getPin()) {
-                    unlockSuccess();
-                } else {
-                    pinError();
-                    showToast('PIN salah! Coba lagi 😢', 'error');
-                }
-            }, 200);
-        }
-    }
-
-    pinKeys.forEach(key => {
-        key.addEventListener('click', () => handleKey(key.dataset.key));
-    });
-
-    // Keyboard support (skip when change PIN modal is open or input is focused)
-    document.addEventListener('keydown', (e) => {
-        if (lockScreen.style.display === 'none') return;
-        if (pinChangeModal.style.display !== 'none') return;
-        if (document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA')) return;
-        if (e.key >= '0' && e.key <= '9') handleKey(e.key);
-        if (e.key === 'Backspace') handleKey('del');
-    });
-
-    // Update hint
-    const hint = document.getElementById('lockHint');
-    if (getPin() !== defaultPin) {
-        hint.textContent = 'Masukkan PIN kamu';
-    }
-
-    // Change PIN
-    changePinBtn.addEventListener('click', () => {
-        pinChangeModal.style.display = 'flex';
-    });
-    cancelPinChange.addEventListener('click', () => {
-        pinChangeModal.style.display = 'none';
-        clearPinInputs();
-    });
-    savePinChange.addEventListener('click', () => {
-        const oldPin = document.getElementById('oldPin').value;
-        const newPin = document.getElementById('newPin').value;
-        const confirmPin = document.getElementById('confirmPin').value;
-
-        if (oldPin !== getPin()) {
-            showToast('PIN lama salah!', 'error');
-            return;
-        }
-        if (newPin.length !== 4 || !/^\d{4}$/.test(newPin)) {
-            showToast('PIN baru harus 4 digit angka!', 'error');
-            return;
-        }
-        if (newPin !== confirmPin) {
-            showToast('Konfirmasi PIN tidak cocok!', 'error');
-            return;
-        }
-
-        localStorage.setItem('diary_pin', newPin);
-        showToast('PIN berhasil diubah! 🔐', 'success');
-        pinChangeModal.style.display = 'none';
-        hint.textContent = 'Masukkan PIN kamu';
-        clearPinInputs();
-    });
-
-    function clearPinInputs() {
-        document.getElementById('oldPin').value = '';
-        document.getElementById('newPin').value = '';
-        document.getElementById('confirmPin').value = '';
-    }
-}
 
 /* ========================================
    MUSIC PLAYER (2 local songs)
@@ -472,6 +342,8 @@ function initDiary() {
 
         showToast('Ceritamu tersimpan 📝');
         renderDiaryEntries();
+        // Auto refresh
+        setTimeout(() => window.location.reload(), 800);
     });
 
     // Load from Firestore on init (merge with local)
@@ -635,6 +507,8 @@ function initGallery() {
         resetGalleryForm();
         showToast('Foto tersimpan! 📸');
         renderGallery();
+        // Auto refresh
+        setTimeout(() => window.location.reload(), 800);
     });
 
     cancelBtn.addEventListener('click', resetGalleryForm);
