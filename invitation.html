@@ -248,35 +248,41 @@
             hc.appendChild(h);
         }
 
-        // Load saved date
-        async function loadInviteData() {
-            let dateVal = localStorage.getItem('diary_date_pick');
-            let rsvpVal = localStorage.getItem('diary_rsvp');
+        // Load saved date and listen for changes
+        function initInviteListeners() {
+            // Listen to Date changing
+            if (typeof dbListenDoc === 'function') {
+                dbListenDoc('settings', 'date_pick', (data) => {
+                    const dateVal = data ? data.value : null;
+                    if (dateVal) {
+                        localStorage.setItem('diary_date_pick', dateVal);
+                        document.getElementById('inviteDate').textContent = `Tanggal ${dateVal} bulan ini 💜`;
+                    } else {
+                        localStorage.removeItem('diary_date_pick');
+                        document.getElementById('inviteDate').textContent = `Menunggu kepastian... 🥺`;
+                    }
+                });
 
-            if (typeof dbLoad === 'function') {
-                const cloudDate = await dbLoad('settings', 'date_pick');
-                if (cloudDate && cloudDate.value) {
-                    dateVal = cloudDate.value;
-                    localStorage.setItem('diary_date_pick', dateVal);
-                }
-                const cloudRsvp = await dbLoad('settings', 'rsvp');
-                if (cloudRsvp && cloudRsvp.value) {
-                    rsvpVal = cloudRsvp.value;
-                    localStorage.setItem('diary_rsvp', rsvpVal);
-                }
-            }
-
-            if (dateVal) {
-                document.getElementById('inviteDate').textContent = `Tanggal ${dateVal} bulan ini 💜`;
-            }
-
-            if (rsvpVal) {
-                document.getElementById('rsvpStatus').textContent = rsvpVal === 'yes'
-                    ? 'yaaayyyyy'
-                    : '';
+                // Listen to RSVP changing
+                dbListenDoc('settings', 'rsvp', (data) => {
+                    const rsvpVal = data ? data.value : null;
+                    if (rsvpVal) {
+                        localStorage.setItem('diary_rsvp', rsvpVal);
+                        document.getElementById('rsvpStatus').textContent = rsvpVal === 'yes' ? 'yaaayyyyy' : '';
+                    } else {
+                        localStorage.removeItem('diary_rsvp');
+                        document.getElementById('rsvpStatus').textContent = '';
+                    }
+                });
+            } else {
+                // Fallback to localStorage
+                const dateVal = localStorage.getItem('diary_date_pick');
+                const rsvpVal = localStorage.getItem('diary_rsvp');
+                if (dateVal) document.getElementById('inviteDate').textContent = `Tanggal ${dateVal} bulan ini 💜`;
+                if (rsvpVal) document.getElementById('rsvpStatus').textContent = rsvpVal === 'yes' ? 'yaaayyyyy' : '';
             }
         }
-        loadInviteData();
+        initInviteListeners();
 
         // RSVP — runaway no button!
         let noAttempts = 0;

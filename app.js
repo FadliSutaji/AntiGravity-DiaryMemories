@@ -338,7 +338,7 @@ function initDiary() {
 
         // Save to Firestore (now with public Cloudinary URL)
         if (typeof dbSave === 'function') {
-            dbSave('diary_entries', String(entry.id), entry);
+            await dbSave('diary_entries', String(entry.id), entry);
         }
 
         // Reset
@@ -532,7 +532,7 @@ function initGallery() {
 
         // Save cloud
         if (typeof dbSave === 'function') {
-            dbSave('gallery_photos', String(photoObj.id), photoObj);
+            await dbSave('gallery_photos', String(photoObj.id), photoObj);
         }
 
         savePhotoBtn.disabled = false;
@@ -732,18 +732,32 @@ function showDateBanner(num) {
     if (clearBtn) clearBtn.style.display = 'block';
 }
 
-// Load saved date pick on page load (called from initDate)
+function hideDateBanner() {
+    const banner = document.getElementById('dateBanner');
+    const clearBtn = document.getElementById('clearDateBtn');
+    if (banner) banner.style.display = 'none';
+    if (clearBtn) clearBtn.style.display = 'none';
+}
+
+// Load saved date pick on page load & listen for changes
 async function loadDatePick() {
-    // Try Firestore first, fallback to localStorage
-    let saved = localStorage.getItem('diary_date_pick');
-    if (typeof dbLoad === 'function') {
-        const cloud = await dbLoad('settings', 'date_pick');
-        if (cloud && cloud.value) {
-            saved = cloud.value;
-            localStorage.setItem('diary_date_pick', saved);
-        }
+    // Listen for real-time changes
+    if (typeof dbListenDoc === 'function') {
+        dbListenDoc('settings', 'date_pick', (data) => {
+            if (data && data.value) {
+                localStorage.setItem('diary_date_pick', data.value);
+                showDateBanner(data.value);
+            } else {
+                localStorage.removeItem('diary_date_pick');
+                hideDateBanner();
+            }
+        });
+    } else {
+        // Fallback to localStorage if Firebase is not ready yet
+        const saved = localStorage.getItem('diary_date_pick');
+        if (saved) showDateBanner(saved);
+        else hideDateBanner();
     }
-    if (saved) showDateBanner(saved);
 }
 
 /* ========================================
@@ -761,5 +775,5 @@ function clearDatePick() {
     if (banner) banner.style.display = 'none';
     if (clearBtn) clearBtn.style.display = 'none';
 
-    showToast('Tanggal dihapus, pilih lagi di bawah ya!', 'info');
+    showToast('Pilihan tanggal dan RSVP dibatalkan', 'info');
 }
