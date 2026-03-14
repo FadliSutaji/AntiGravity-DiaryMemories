@@ -1,0 +1,593 @@
+/* ========================================
+   RUANG HATI — DIARY WEBSITE v2
+   PIN Lock • Music • Themes • Photos
+   ======================================== */
+
+document.addEventListener('DOMContentLoaded', () => {
+    initTheme();
+    initParticles();
+    initPinLock();
+});
+
+// Called after successful unlock
+function initApp() {
+    initNavbar();
+    initDate();
+    initMusic();
+    initDiary();
+    initGallery();
+
+    initLightbox();
+    initScrollAnimations();
+}
+
+/* ========================================
+   THEME (Light / Dark)
+   ======================================== */
+function initTheme() {
+    const saved = localStorage.getItem('diary_theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', saved);
+    updateThemeIcon(saved);
+
+    const toggle = document.getElementById('themeToggle');
+    toggle.addEventListener('click', () => {
+        const current = document.documentElement.getAttribute('data-theme');
+        const next = current === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', next);
+        localStorage.setItem('diary_theme', next);
+        updateThemeIcon(next);
+    });
+}
+
+function updateThemeIcon(theme) {
+    const icon = document.getElementById('themeIcon');
+    if (icon) icon.textContent = theme === 'dark' ? '☀️' : '🌙';
+}
+
+/* ========================================
+   PARTICLES
+   ======================================== */
+function initParticles() {
+    const container = document.getElementById('particles');
+    const count = 30;
+    for (let i = 0; i < count; i++) {
+        const p = document.createElement('div');
+        p.className = 'particle';
+        const size = Math.random() * 4 + 1;
+        const colors = ['#a855f7', '#c084fc', '#ec4899', '#f472b6', '#818cf8'];
+        p.style.cssText = `
+            left: ${Math.random() * 100}%;
+            width: ${size}px; height: ${size}px;
+            background: ${colors[Math.floor(Math.random() * colors.length)]};
+            animation-duration: ${Math.random() * 15 + 10}s;
+            animation-delay: ${Math.random() * 10}s;
+        `;
+        container.appendChild(p);
+    }
+}
+
+/* ========================================
+   PIN LOCK
+   ======================================== */
+function initPinLock() {
+    const lockScreen = document.getElementById('lockScreen');
+    const appWrapper = document.getElementById('appWrapper');
+    const pinDots = document.querySelectorAll('.pin-dot');
+    const pinKeys = document.querySelectorAll('.pin-key[data-key]');
+    const changePinBtn = document.getElementById('changePinBtn');
+    const pinChangeModal = document.getElementById('pinChangeModal');
+    const cancelPinChange = document.getElementById('cancelPinChange');
+    const savePinChange = document.getElementById('savePinChange');
+
+    let enteredPin = '';
+    const defaultPin = '1711';
+
+    function getPin() {
+        return localStorage.getItem('diary_pin') || defaultPin;
+    }
+
+    function updateDots() {
+        pinDots.forEach((dot, i) => {
+            dot.classList.toggle('filled', i < enteredPin.length);
+            dot.classList.remove('error');
+        });
+    }
+
+    function unlockSuccess() {
+        lockScreen.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+        lockScreen.style.opacity = '0';
+        lockScreen.style.transform = 'scale(1.05)';
+        setTimeout(() => {
+            lockScreen.style.display = 'none';
+            appWrapper.style.display = 'block';
+            appWrapper.style.opacity = '0';
+            appWrapper.style.transition = 'opacity 0.5s ease';
+            requestAnimationFrame(() => { appWrapper.style.opacity = '1'; });
+            initApp();
+        }, 500);
+    }
+
+    function pinError() {
+        pinDots.forEach(dot => dot.classList.add('error'));
+        setTimeout(() => {
+            enteredPin = '';
+            updateDots();
+        }, 600);
+    }
+
+    function handleKey(key) {
+        if (key === 'del') {
+            enteredPin = enteredPin.slice(0, -1);
+            updateDots();
+            return;
+        }
+        if (enteredPin.length >= 4) return;
+        enteredPin += key;
+        updateDots();
+
+        if (enteredPin.length === 4) {
+            setTimeout(() => {
+                if (enteredPin === getPin()) {
+                    unlockSuccess();
+                } else {
+                    pinError();
+                    showToast('PIN salah! Coba lagi 😢', 'error');
+                }
+            }, 200);
+        }
+    }
+
+    pinKeys.forEach(key => {
+        key.addEventListener('click', () => handleKey(key.dataset.key));
+    });
+
+    // Keyboard support
+    document.addEventListener('keydown', (e) => {
+        if (lockScreen.style.display === 'none') return;
+        if (e.key >= '0' && e.key <= '9') handleKey(e.key);
+        if (e.key === 'Backspace') handleKey('del');
+    });
+
+    // Update hint
+    const hint = document.getElementById('lockHint');
+    if (getPin() !== defaultPin) {
+        hint.textContent = 'Masukkan PIN kamu';
+    }
+
+    // Change PIN
+    changePinBtn.addEventListener('click', () => {
+        pinChangeModal.style.display = 'flex';
+    });
+    cancelPinChange.addEventListener('click', () => {
+        pinChangeModal.style.display = 'none';
+        clearPinInputs();
+    });
+    savePinChange.addEventListener('click', () => {
+        const oldPin = document.getElementById('oldPin').value;
+        const newPin = document.getElementById('newPin').value;
+        const confirmPin = document.getElementById('confirmPin').value;
+
+        if (oldPin !== getPin()) {
+            showToast('PIN lama salah!', 'error');
+            return;
+        }
+        if (newPin.length !== 4 || !/^\d{4}$/.test(newPin)) {
+            showToast('PIN baru harus 4 digit angka!', 'error');
+            return;
+        }
+        if (newPin !== confirmPin) {
+            showToast('Konfirmasi PIN tidak cocok!', 'error');
+            return;
+        }
+
+        localStorage.setItem('diary_pin', newPin);
+        showToast('PIN berhasil diubah! 🔐', 'success');
+        pinChangeModal.style.display = 'none';
+        hint.textContent = 'Masukkan PIN kamu';
+        clearPinInputs();
+    });
+
+    function clearPinInputs() {
+        document.getElementById('oldPin').value = '';
+        document.getElementById('newPin').value = '';
+        document.getElementById('confirmPin').value = '';
+    }
+}
+
+/* ========================================
+   MUSIC PLAYER
+   ======================================== */
+function initMusic() {
+    const audio = document.getElementById('bgMusic');
+    const toggle = document.getElementById('musicToggle');
+    let isPlaying = false;
+
+    audio.volume = 0.3;
+
+    toggle.addEventListener('click', () => {
+        if (isPlaying) {
+            audio.pause();
+            toggle.classList.remove('playing');
+        } else {
+            audio.play().catch(() => { });
+            toggle.classList.add('playing');
+        }
+        isPlaying = !isPlaying;
+    });
+}
+
+/* ========================================
+   NAVBAR
+   ======================================== */
+function initNavbar() {
+    const navbar = document.getElementById('navbar');
+    const navToggle = document.getElementById('navToggle');
+    const mobileMenu = document.getElementById('mobileMenu');
+    const navLinks = document.querySelectorAll('.nav-link, .mobile-link');
+
+    window.addEventListener('scroll', () => {
+        navbar.classList.toggle('scrolled', window.scrollY > 50);
+    });
+
+    navToggle.addEventListener('click', () => {
+        navToggle.classList.toggle('active');
+        mobileMenu.classList.toggle('active');
+    });
+
+    navLinks.forEach(link => {
+        link.addEventListener('click', () => {
+            const section = link.dataset.section;
+            document.querySelectorAll('.nav-link, .mobile-link').forEach(l => l.classList.remove('active'));
+            document.querySelectorAll(`[data-section="${section}"]`).forEach(l => l.classList.add('active'));
+            navToggle.classList.remove('active');
+            mobileMenu.classList.remove('active');
+        });
+    });
+
+    // Scroll spy
+    const sections = document.querySelectorAll('section[id]');
+    window.addEventListener('scroll', () => {
+        let current = '';
+        sections.forEach(s => {
+            if (window.scrollY >= s.offsetTop - 150) current = s.id;
+        });
+        document.querySelectorAll('.nav-link, .mobile-link').forEach(l => {
+            l.classList.toggle('active', l.dataset.section === current);
+        });
+    });
+}
+
+/* ========================================
+   DATE
+   ======================================== */
+function initDate() {
+    const el = document.getElementById('currentDate');
+    el.textContent = new Date().toLocaleDateString('id-ID', {
+        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+    });
+}
+
+function formatDate(dateStr) {
+    return new Date(dateStr).toLocaleDateString('id-ID', {
+        weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit'
+    });
+}
+
+/* ========================================
+   STORAGE + TOAST
+   ======================================== */
+function getData(key) {
+    try { return JSON.parse(localStorage.getItem(key)) || []; }
+    catch { return []; }
+}
+
+function saveData(key, data) {
+    localStorage.setItem(key, JSON.stringify(data));
+}
+
+function showToast(message, type = 'success') {
+    const container = document.getElementById('toastContainer');
+    const icons = { success: '✅', error: '❌', info: '💜' };
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.innerHTML = `<span>${icons[type] || '💜'}</span><span>${message}</span>`;
+    container.appendChild(toast);
+    setTimeout(() => {
+        toast.style.animation = 'toastOut 0.4s ease-out forwards';
+        setTimeout(() => toast.remove(), 400);
+    }, 3000);
+}
+
+function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+}
+
+/* ========================================
+   DIARY (Unified / Shared)
+   ======================================== */
+function initDiary() {
+    const titleInput = document.getElementById('diaryTitle');
+    const contentInput = document.getElementById('diaryContent');
+    const charCount = document.getElementById('charCount');
+    const saveBtn = document.getElementById('saveDiary');
+    const moodBtns = document.querySelectorAll('.mood-btn');
+    const photoInput = document.getElementById('diaryPhotoInput');
+    const photoBtn = document.getElementById('diaryPhotoBtn');
+    const photoPreview = document.getElementById('diaryPhotoPreview');
+    const previewImg = document.getElementById('diaryPreviewImg');
+    const removeBtn = document.getElementById('removeDiaryPhoto');
+    let selectedMood = '';
+    let attachedPhoto = null;
+
+    // Mood
+    moodBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            moodBtns.forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            selectedMood = btn.dataset.mood;
+        });
+    });
+
+    // Char count
+    contentInput.addEventListener('input', () => {
+        const c = contentInput.value.length;
+        charCount.textContent = c;
+        charCount.style.color = c > 1800 ? '#ef4444' : '';
+    });
+
+    // Photo attachment
+    photoBtn.addEventListener('click', () => photoInput.click());
+    photoInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+            attachedPhoto = ev.target.result;
+            previewImg.src = attachedPhoto;
+            photoPreview.style.display = 'inline-block';
+        };
+        reader.readAsDataURL(file);
+    });
+    removeBtn.addEventListener('click', () => {
+        attachedPhoto = null;
+        photoPreview.style.display = 'none';
+        photoInput.value = '';
+    });
+
+    // Save
+    saveBtn.addEventListener('click', () => {
+        const title = titleInput.value.trim();
+        const content = contentInput.value.trim();
+
+        if (!content && !attachedPhoto) {
+            showToast('Tulis dulu ceritamu, atau tambah foto ya... 💜', 'error');
+            contentInput.focus();
+            return;
+        }
+
+        const entries = getData('diary_entries');
+        entries.unshift({
+            id: Date.now(),
+            title: title || 'Tanpa Judul',
+            content,
+            mood: selectedMood || '💭',
+            photo: attachedPhoto || null,
+            date: new Date().toISOString()
+        });
+        saveData('diary_entries', entries);
+
+        // Reset
+        titleInput.value = '';
+        contentInput.value = '';
+        charCount.textContent = '0';
+        moodBtns.forEach(b => b.classList.remove('selected'));
+        selectedMood = '';
+        attachedPhoto = null;
+        photoPreview.style.display = 'none';
+        photoInput.value = '';
+
+        showToast('Ceritamu tersimpan 📝');
+        renderDiaryEntries();
+    });
+
+    renderDiaryEntries();
+}
+
+function renderDiaryEntries() {
+    const container = document.getElementById('diaryEntries');
+    const entries = getData('diary_entries');
+
+    if (entries.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-icon">📝</div>
+                <h3>Belum ada cerita</h3>
+                <p>Mulai tulis curahan hati kita di atas. Semua perasaan valid. 💜</p>
+            </div>`;
+        return;
+    }
+
+    container.innerHTML = entries.map(e => `
+        <div class="diary-entry" data-id="${e.id}">
+            <div class="entry-card">
+                <div class="entry-header">
+                    <div class="entry-meta">
+                        <span class="entry-mood">${e.mood}</span>
+                        <span class="entry-date">${formatDate(e.date)}</span>
+                    </div>
+                    <button class="entry-delete" onclick="deleteDiaryEntry(${e.id})" title="Hapus">🗑️</button>
+                </div>
+                <h3 class="entry-title">${escapeHtml(e.title)}</h3>
+                ${e.content ? `<p class="entry-content">${escapeHtml(e.content)}</p>` : ''}
+                ${e.photo ? `<div class="entry-photo" onclick="openLightbox('${e.photo.replace(/'/g, "\\'")}', '${escapeHtml(e.title).replace(/'/g, "\\'")}')"><img src="${e.photo}" alt="${escapeHtml(e.title)}" loading="lazy"></div>` : ''}
+            </div>
+        </div>
+    `).join('');
+}
+
+function deleteDiaryEntry(id) {
+    if (!confirm('Yakin mau hapus cerita ini? 😢')) return;
+    let entries = getData('diary_entries');
+    entries = entries.filter(e => e.id !== id);
+    saveData('diary_entries', entries);
+    showToast('Cerita dihapus', 'info');
+    renderDiaryEntries();
+}
+
+/* ========================================
+   GALLERY
+   ======================================== */
+function initGallery() {
+    const uploadArea = document.getElementById('uploadArea');
+    const photoInput = document.getElementById('photoInput');
+    const uploadBtn = document.getElementById('uploadBtn');
+    const captionForm = document.getElementById('captionForm');
+    const previewImg = document.getElementById('previewImg');
+    const photoCaption = document.getElementById('photoCaption');
+    const savePhotoBtn = document.getElementById('savePhoto');
+    const cancelBtn = document.getElementById('cancelUpload');
+    let pendingPhoto = null;
+
+    uploadBtn.addEventListener('click', (e) => { e.stopPropagation(); photoInput.click(); });
+    uploadArea.addEventListener('click', () => photoInput.click());
+
+    uploadArea.addEventListener('dragover', (e) => { e.preventDefault(); uploadArea.classList.add('dragover'); });
+    uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('dragover'));
+    uploadArea.addEventListener('drop', (e) => {
+        e.preventDefault();
+        uploadArea.classList.remove('dragover');
+        const file = e.dataTransfer.files[0];
+        if (file && file.type.startsWith('image/')) processGalleryPhoto(file);
+    });
+
+    photoInput.addEventListener('change', (e) => {
+        if (e.target.files[0]) processGalleryPhoto(e.target.files[0]);
+    });
+
+    function processGalleryPhoto(file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            pendingPhoto = e.target.result;
+            previewImg.src = pendingPhoto;
+            captionForm.style.display = 'block';
+            uploadArea.style.display = 'none';
+            photoCaption.focus();
+        };
+        reader.readAsDataURL(file);
+    }
+
+    savePhotoBtn.addEventListener('click', () => {
+        if (!pendingPhoto) return;
+        const photos = getData('gallery_photos');
+        photos.unshift({
+            id: Date.now(),
+            src: pendingPhoto,
+            caption: photoCaption.value.trim() || '',
+            date: new Date().toISOString()
+        });
+        saveData('gallery_photos', photos);
+        resetGalleryForm();
+        showToast('Foto tersimpan! 📸');
+        renderGallery();
+    });
+
+    cancelBtn.addEventListener('click', resetGalleryForm);
+
+    function resetGalleryForm() {
+        pendingPhoto = null;
+        photoCaption.value = '';
+        captionForm.style.display = 'none';
+        uploadArea.style.display = 'block';
+        photoInput.value = '';
+    }
+
+    renderGallery();
+}
+
+function renderGallery() {
+    const container = document.getElementById('galleryGrid');
+    const photos = getData('gallery_photos');
+
+    if (photos.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state" style="grid-column: 1 / -1;">
+                <div class="empty-icon">📸</div>
+                <h3>Belum ada foto</h3>
+                <p>Upload foto-foto kenangan kita di sini.</p>
+            </div>`;
+        return;
+    }
+
+    container.innerHTML = photos.map(p => `
+        <div class="gallery-item" data-id="${p.id}" onclick="openLightbox('${p.src.replace(/'/g, "\\'")}', '${escapeHtml(p.caption).replace(/'/g, "\\'")}')">
+            <div class="photo-wrapper">
+                <img src="${p.src}" alt="${escapeHtml(p.caption)}" loading="lazy">
+            </div>
+            <div class="photo-info">
+                <span class="photo-caption">${escapeHtml(p.caption) || '✦'}</span>
+                <div class="photo-date">${formatDate(p.date)}</div>
+            </div>
+            <button class="photo-delete-btn" onclick="event.stopPropagation(); deletePhoto(${p.id})" title="Hapus">✕</button>
+        </div>
+    `).join('');
+}
+
+function deletePhoto(id) {
+    if (!confirm('Hapus foto ini?')) return;
+    let photos = getData('gallery_photos');
+    photos = photos.filter(p => p.id !== id);
+    saveData('gallery_photos', photos);
+    showToast('Foto dihapus', 'info');
+    renderGallery();
+}
+
+
+
+/* ========================================
+   LIGHTBOX
+   ======================================== */
+function initLightbox() {
+    const lightbox = document.getElementById('lightbox');
+    const closeBtn = document.getElementById('lightboxClose');
+    closeBtn.addEventListener('click', closeLightbox);
+    lightbox.addEventListener('click', (e) => { if (e.target === lightbox) closeLightbox(); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeLightbox(); });
+}
+
+function openLightbox(src, caption) {
+    const lb = document.getElementById('lightbox');
+    document.getElementById('lightboxImg').src = src;
+    document.getElementById('lightboxCaption').textContent = caption || '';
+    lb.classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeLightbox() {
+    document.getElementById('lightbox').classList.remove('active');
+    document.body.style.overflow = '';
+}
+
+/* ========================================
+   SCROLL ANIMATIONS
+   ======================================== */
+function initScrollAnimations() {
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) entry.target.classList.add('visible');
+        });
+    }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+    document.querySelectorAll('.section-header, .glass-card, .diary-entry, .gallery-item').forEach(el => {
+        el.classList.add('animate-on-scroll');
+        observer.observe(el);
+    });
+
+    const style = document.createElement('style');
+    style.textContent = `
+        .animate-on-scroll { opacity: 0; transform: translateY(30px); transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
+        .animate-on-scroll.visible { opacity: 1; transform: translateY(0); }
+    `;
+    document.head.appendChild(style);
+}

@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Ruang Hati — Diary pribadi, tempat curahan hati dan kenangan indah bersama">
+    <title>💜 Ruang Hati — Our Diary</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- Floating particles -->
+    <div class="particles" id="particles"></div>
+
+    <!-- ===== PIN LOCK SCREEN ===== -->
+    <div class="lock-screen" id="lockScreen">
+        <div class="lock-overlay"></div>
+        <div class="lock-content">
+            <div class="lock-icon">🔒</div>
+            <h2 class="lock-title">Ruang aku sayang km</h2>
+            <p class="lock-subtitle">Tebak beb</p>
+            <div class="pin-dots" id="pinDots">
+                <span class="pin-dot"></span>
+                <span class="pin-dot"></span>
+                <span class="pin-dot"></span>
+                <span class="pin-dot"></span>
+            </div>
+            <div class="pin-pad">
+                <button class="pin-key" data-key="1">1</button>
+                <button class="pin-key" data-key="2">2</button>
+                <button class="pin-key" data-key="3">3</button>
+                <button class="pin-key" data-key="4">4</button>
+                <button class="pin-key" data-key="5">5</button>
+                <button class="pin-key" data-key="6">6</button>
+                <button class="pin-key" data-key="7">7</button>
+                <button class="pin-key" data-key="8">8</button>
+                <button class="pin-key" data-key="9">9</button>
+                <button class="pin-key pin-key-empty"></button>
+                <button class="pin-key" data-key="0">0</button>
+                <button class="pin-key pin-key-del" data-key="del">⌫</button>
+            </div>
+            <p class="lock-hint" id="lockHint">PIN : Tanggal smm bulan</p>
+            <button class="btn btn-secondary btn-sm" id="changePinBtn">Ubah PIN</button>
+        </div>
+
+        <!-- Change PIN Modal -->
+        <div class="pin-change-modal" id="pinChangeModal" style="display:none;">
+            <div class="pin-change-card glass-card">
+                <h3>🔐 Ubah PIN</h3>
+                <input type="password" id="oldPin" class="pin-input" placeholder="PIN lama" maxlength="4"
+                    inputmode="numeric">
+                <input type="password" id="newPin" class="pin-input" placeholder="PIN baru (4 digit)" maxlength="4"
+                    inputmode="numeric">
+                <input type="password" id="confirmPin" class="pin-input" placeholder="Konfirmasi PIN baru" maxlength="4"
+                    inputmode="numeric">
+                <div class="form-actions">
+                    <button class="btn btn-secondary btn-sm" id="cancelPinChange">Batal</button>
+                    <button class="btn btn-primary btn-sm" id="savePinChange">Simpan</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== MAIN APP (hidden until unlocked) ===== -->
+    <div class="app-wrapper" id="appWrapper" style="display:none;">
+
+        <!-- Background Music Player -->
+        <div class="music-player" id="musicPlayer">
+            <button class="music-toggle" id="musicToggle" title="Play/Pause Musik">
+                <span class="music-icon" id="musicIcon">🎵</span>
+                <span class="music-bars" id="musicBars">
+                    <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+                </span>
+            </button>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="navbar" id="navbar">
+            <div class="nav-brand">
+                <span class="nav-icon">📖</span>
+                <span class="nav-title">Ruang Hati</span>
+            </div>
+            <div class="nav-links">
+                <a href="#home" class="nav-link active" data-section="home">Beranda</a>
+                <a href="#diary" class="nav-link" data-section="diary">Diary</a>
+                <a href="#gallery" class="nav-link" data-section="gallery">Galeri</a>
+
+            </div>
+            <div class="nav-right">
+                <button class="theme-toggle" id="themeToggle" title="Toggle Light/Dark">
+                    <span class="theme-icon" id="themeIcon">☀️</span>
+                </button>
+                <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">
+                    <span></span><span></span><span></span>
+                </button>
+            </div>
+        </nav>
+
+        <!-- Mobile Menu -->
+        <div class="mobile-menu" id="mobileMenu">
+            <a href="#home" class="mobile-link" data-section="home">Beranda</a>
+            <a href="#diary" class="mobile-link" data-section="diary">Diary</a>
+            <a href="#gallery" class="mobile-link" data-section="gallery">Galeri</a>
+
+        </div>
+
+        <!-- ===== HERO SECTION ===== -->
+        <section class="hero" id="home">
+            <div class="hero-overlay"></div>
+            <div class="hero-content">
+                <p class="hero-label">✦ Our Personal Space ✦</p>
+                <h1 class="hero-title">
+                    <span class="title-line">Ruang</span>
+                    <span class="title-line accent">Hati</span>
+                    <span class="title-line small">Kita</span>
+                </h1>
+                <p class="hero-subtitle">
+                    Tempat kita menuangkan semua rasa, berdua. <br>
+                    Karena kadang, hati butuh ruang untuk bicara.
+                </p>
+                <div class="hero-cta">
+                    <a href="#diary" class="btn btn-primary">Tulis Diary 📝</a>
+                    <a href="#gallery" class="btn btn-secondary">Galeri Foto 📸</a>
+                </div>
+                <div class="hero-date">
+                    <span id="currentDate"></span>
+                </div>
+            </div>
+            <div class="scroll-indicator">
+                <div class="mouse">
+                    <div class="mouse-wheel"></div>
+                </div>
+                <span>Scroll ke bawah</span>
+            </div>
+        </section>
+
+        <!-- ===== DIARY SECTION (unified, shared) ===== -->
+        <section class="section diary-section" id="diary">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-tag">📝 Keluh Kesah Kita</span>
+                    <h2 class="section-title">Diary <span class="accent">Kita</span></h2>
+                    <p class="section-desc">Tempat kita berdua menuliskan semua yang dirasakan. Nggak apa-apa kalau
+                        ngerasa beda. 💜</p>
+                </div>
+
+                <!-- New Entry Form -->
+                <div class="diary-form-wrapper">
+                    <div class="diary-form glass-card cute-card">
+                        <div class="cute-sticker cute-sticker-1">✨</div>
+                        <div class="cute-sticker cute-sticker-2">🌙</div>
+                        <div class="form-header">
+                            <h3>✍️ Tulis Curahan Hati</h3>
+                            <div class="mood-selector">
+                                <span class="mood-label">Mood:</span>
+                                <button class="mood-btn" data-mood="😢" title="Sedih">😢</button>
+                                <button class="mood-btn" data-mood="😔" title="Galau">😔</button>
+                                <button class="mood-btn" data-mood="😐" title="Biasa">😐</button>
+                                <button class="mood-btn" data-mood="🥺" title="Ngerasa beda">🥺</button>
+                                <button class="mood-btn" data-mood="😊" title="Senang">😊</button>
+                                <button class="mood-btn" data-mood="💜" title="Cinta">💜</button>
+                                <button class="mood-btn" data-mood="🫠" title="Capek">🫠</button>
+                                <button class="mood-btn" data-mood="🥰" title="Sayang">🥰</button>
+                            </div>
+                        </div>
+                        <input type="text" class="diary-input-title" id="diaryTitle"
+                            placeholder="Judul ceritamu hari ini..." maxlength="100">
+                        <textarea class="diary-textarea" id="diaryContent"
+                            placeholder="Ceritakan apa yang kamu rasakan... &#10;&#10;Nggak apa-apa kalau kamu ngerasa beda. Semua perasaan itu valid. 💜"
+                            rows="6"></textarea>
+                        <!-- Photo attachment in diary -->
+                        <div class="diary-photo-attach">
+                            <input type="file" id="diaryPhotoInput" accept="image/*" hidden>
+                            <button class="btn btn-secondary btn-sm" id="diaryPhotoBtn">📷 Tambah Foto</button>
+                            <div class="diary-photo-preview" id="diaryPhotoPreview" style="display:none;">
+                                <img id="diaryPreviewImg" src="" alt="Preview">
+                                <button class="remove-photo-btn" id="removeDiaryPhoto">✕</button>
+                            </div>
+                        </div>
+                        <div class="form-actions">
+                            <div class="char-count"><span id="charCount">0</span> / 2000</div>
+                            <button class="btn btn-primary btn-glow" id="saveDiary">
+                                <span>Simpan 💾</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Diary Entries (cute card style) -->
+                <div class="diary-entries" id="diaryEntries"></div>
+            </div>
+        </section>
+
+        <!-- ===== GALLERY SECTION ===== -->
+        <section class="section gallery-section" id="gallery">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-tag">📸 Kenangan Kita</span>
+                    <h2 class="section-title">Galeri <span class="accent">Foto</span></h2>
+                    <p class="section-desc">Simpan momen-momen indah yang ingin kita kenang selamanya.</p>
+                </div>
+
+                <!-- Upload Area -->
+                <div class="upload-area glass-card" id="uploadArea">
+                    <div class="upload-content">
+                        <div class="upload-icon">📷</div>
+                        <h3>Tambah Foto Kenangan</h3>
+                        <p>Drag & drop foto di sini, atau klik untuk pilih</p>
+                        <input type="file" id="photoInput" accept="image/*" multiple hidden>
+                        <button class="btn btn-primary" id="uploadBtn">Pilih Foto</button>
+                    </div>
+                </div>
+
+                <!-- Caption Form -->
+                <div class="caption-form glass-card" id="captionForm" style="display:none;">
+                    <div class="preview-img-wrapper">
+                        <img id="previewImg" src="" alt="Preview">
+                    </div>
+                    <input type="text" id="photoCaption" class="diary-input-title"
+                        placeholder="Tulis caption untuk foto ini...">
+                    <div class="form-actions">
+                        <button class="btn btn-secondary" id="cancelUpload">Batal</button>
+                        <button class="btn btn-primary" id="savePhoto">Simpan Foto</button>
+                    </div>
+                </div>
+
+                <!-- Gallery Grid -->
+                <div class="gallery-grid" id="galleryGrid"></div>
+            </div>
+        </section>
+
+
+        <!-- ===== FOOTER ===== -->
+        <footer class="footer">
+            <div class="footer-content">
+                <div class="footer-quote">
+                    <p>"Kadang yang kita butuhkan bukan jawaban, tapi seseorang yang mau mendengarkan."</p>
+                </div>
+                <div class="footer-brand">
+                    <span>💜 Ruang Hati — Our Diary</span>
+                </div>
+                <p class="footer-copy">Made with love & tears. 2024–2026</p>
+            </div>
+        </footer>
+
+    </div> <!-- /app-wrapper -->
+
+    <!-- Lightbox -->
+    <div class="lightbox" id="lightbox">
+        <button class="lightbox-close" id="lightboxClose">✕</button>
+        <div class="lightbox-content">
+            <img id="lightboxImg" src="" alt="">
+            <p class="lightbox-caption" id="lightboxCaption"></p>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Background Music (royalty free chill LoFi) -->
+    <audio id="bgMusic" loop preload="auto">
+        <source src="https://cdn.pixabay.com/audio/2024/11/01/audio_4956b4edd1.mp3" type="audio/mpeg">
+    </audio>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
