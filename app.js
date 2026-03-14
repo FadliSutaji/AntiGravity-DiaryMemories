@@ -553,6 +553,66 @@ function initGallery() {
         photoInput.value = '';
     }
 
+    // Real-time listener for gallery
+    if (typeof dbListen === 'function') {
+        dbListen('gallery_photos', (cloudPhotos) => {
+            if (!cloudPhotos || !cloudPhotos.length) return;
+            const localPhotos = getData('gallery_photos');
+            const localIds = new Set(localPhotos.map(p => String(p.id)));
+            let merged = [...localPhotos];
+            let changed = false;
+
+            cloudPhotos.forEach(cp => {
+                if (!localIds.has(String(cp.id))) {
+                    merged.push(cp);
+                    changed = true;
+                }
+            });
+
+            // Remove entries deleted from cloud
+            const cloudIds = new Set(cloudPhotos.map(p => String(p.id)));
+            const beforeLen = merged.length;
+            merged = merged.filter(p => cloudIds.has(String(p.id)) || !localIds.has(String(p.id)));
+            if (merged.length !== beforeLen) changed = true;
+
+            if (changed) {
+                merged.sort((a, b) => new Date(b.date) - new Date(a.date));
+                saveData('gallery_photos', merged);
+                renderGallery();
+            }
+        });
+    }
+
+    // Initial load from cloud
+    async function initGalleryCloud() {
+        if (typeof dbLoadAll !== 'function') return;
+        try {
+            const cloudPhotos = await dbLoadAll('gallery_photos', 'date', 'desc');
+            if (!cloudPhotos || !cloudPhotos.length) return;
+            
+            const localPhotos = getData('gallery_photos');
+            const localIds = new Set(localPhotos.map(p => String(p.id)));
+            let merged = [...localPhotos];
+            let changed = false;
+
+            cloudPhotos.forEach(cp => {
+                if (!localIds.has(String(cp.id))) {
+                    merged.push(cp);
+                    changed = true;
+                }
+            });
+
+            if (changed) {
+                merged.sort((a, b) => new Date(b.date) - new Date(a.date));
+                saveData('gallery_photos', merged);
+                renderGallery();
+            }
+        } catch (err) {
+            console.warn('Failed to load gallery from cloud:', err);
+        }
+    }
+    initGalleryCloud();
+
     renderGallery();
 }
 
