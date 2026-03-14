@@ -316,9 +316,9 @@ function initDiary() {
         showToast('Menyimpan...', 'info');
 
         let photoUrl = attachedPhoto;
-        // Upload photo to Firebase Storage if exists and is local base64
+        // Upload photo to Cloudinary if exists and is local base64
         if (photoUrl && typeof dbUploadImage === 'function' && photoUrl.startsWith('data:image')) {
-            const uploadedUrl = await dbUploadImage(photoUrl, 'diary');
+            const uploadedUrl = await dbUploadImage(photoUrl);
             if (uploadedUrl) photoUrl = uploadedUrl;
         }
 
@@ -336,7 +336,7 @@ function initDiary() {
         entries.unshift(entry);
         saveData('diary_entries', entries);
 
-        // Save to Firestore (now with public photo URL)
+        // Save to Firestore (now with public Cloudinary URL)
         if (typeof dbSave === 'function') {
             dbSave('diary_entries', String(entry.id), entry);
         }
@@ -512,9 +512,9 @@ function initGallery() {
         showToast('Mengupload foto... ⏳', 'info');
 
         let photoUrl = pendingPhoto;
-        // Upload to Firebase Storage
+        // Upload to Cloudinary
         if (typeof dbUploadImage === 'function' && photoUrl.startsWith('data:image')) {
-            const uploadedUrl = await dbUploadImage(photoUrl, 'gallery');
+            const uploadedUrl = await dbUploadImage(photoUrl);
             if (uploadedUrl) photoUrl = uploadedUrl;
         }
 
@@ -542,66 +542,6 @@ function initGallery() {
         // Auto refresh
         setTimeout(() => window.location.reload(), 800);
     });
-
-    // Real-time listener for gallery
-    if (typeof dbListen === 'function') {
-        dbListen('gallery_photos', (cloudPhotos) => {
-            if (!cloudPhotos || !cloudPhotos.length) return;
-            const localPhotos = getData('gallery_photos');
-            const localIds = new Set(localPhotos.map(p => String(p.id)));
-            let merged = [...localPhotos];
-            let changed = false;
-
-            cloudPhotos.forEach(cp => {
-                if (!localIds.has(String(cp.id))) {
-                    merged.push(cp);
-                    changed = true;
-                }
-            });
-
-            // Remove entries deleted from cloud
-            const cloudIds = new Set(cloudPhotos.map(p => String(p.id)));
-            const beforeLen = merged.length;
-            merged = merged.filter(p => cloudIds.has(String(p.id)) || !localIds.has(String(p.id)));
-            if (merged.length !== beforeLen) changed = true;
-
-            if (changed) {
-                merged.sort((a, b) => new Date(b.date) - new Date(a.date));
-                saveData('gallery_photos', merged);
-                renderGallery();
-            }
-        });
-    }
-
-    // Initial load from cloud
-    async function initGalleryCloud() {
-        if (typeof dbLoadAll !== 'function') return;
-        try {
-            const cloudPhotos = await dbLoadAll('gallery_photos', 'date', 'desc');
-            if (!cloudPhotos || !cloudPhotos.length) return;
-            
-            const localPhotos = getData('gallery_photos');
-            const localIds = new Set(localPhotos.map(p => String(p.id)));
-            let merged = [...localPhotos];
-            let changed = false;
-
-            cloudPhotos.forEach(cp => {
-                if (!localIds.has(String(cp.id))) {
-                    merged.push(cp);
-                    changed = true;
-                }
-            });
-
-            if (changed) {
-                merged.sort((a, b) => new Date(b.date) - new Date(a.date));
-                saveData('gallery_photos', merged);
-                renderGallery();
-            }
-        } catch (err) {
-            console.warn('Failed to load gallery from cloud:', err);
-        }
-    }
-    initGalleryCloud();
 
     cancelBtn.addEventListener('click', resetGalleryForm);
 

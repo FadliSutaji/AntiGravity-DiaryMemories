@@ -17,7 +17,6 @@ firebase.initializeApp({
 });
 
 const db = firebase.firestore();
-const storage = firebase.storage();
 
 /* ========================================
    FIRESTORE HELPERS
@@ -82,23 +81,35 @@ function dbListenDoc(collection, docId, callback) {
     );
 }
 
-// Upload base64 image to Firebase Storage and return public URL
-async function dbUploadImage(base64Data, folder = 'photos') {
+// Upload base64 image to Cloudinary and return public URL
+async function dbUploadImage(base64Data) {
     try {
-        if (!base64Data || !base64Data.startsWith('data:image')) return base64Data; // Already a URL or null
+        if (!base64Data || !base64Data.startsWith('data:image')) return base64Data; // Already URL or null
 
-        const filename = `${folder}/${Date.now()}-${Math.floor(Math.random() * 10000)}.jpg`;
-        const storageRef = storage.ref().child(filename);
-        
-        // Upload string
-        const snapshot = await storageRef.putString(base64Data, 'data_url');
-        // Get public URL
-        const downloadURL = await snapshot.ref.getDownloadURL();
-        return downloadURL;
+        const cloudName = 'dwhfh6ak0';
+        const uploadPreset = 'diary-fafa';
+        const url = `https://api.cloudinary.com/v1_1/${cloudName}/upload`;
+
+        const formData = new FormData();
+        formData.append('file', base64Data);
+        formData.append('upload_preset', uploadPreset);
+
+        const response = await fetch(url, {
+            method: 'POST',
+            body: formData
+        });
+
+        const data = await response.json();
+        if (data.secure_url) {
+            return data.secure_url;
+        } else {
+            console.warn('Cloudinary upload failed:', data);
+            return null;
+        }
     } catch (e) {
-        console.warn('Firebase Storage upload failed:', e);
+        console.warn('Cloudinary upload error:', e);
         return null;
     }
 }
 
-console.log('🔥 Firebase (Firestore + Storage) connected — diary-fafa');
+console.log('🔥 Firebase (Firestore) & ☁️ Cloudinary connected! — diary-fafa');
