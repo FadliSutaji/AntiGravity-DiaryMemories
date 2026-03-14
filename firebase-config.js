@@ -17,6 +17,7 @@ firebase.initializeApp({
 });
 
 const db = firebase.firestore();
+const storage = firebase.storage();
 
 /* ========================================
    FIRESTORE HELPERS
@@ -81,4 +82,23 @@ function dbListenDoc(collection, docId, callback) {
     );
 }
 
-console.log('🔥 Firebase connected — diary-fafa');
+// Upload base64 image to Firebase Storage and return public URL
+async function dbUploadImage(base64Data, folder = 'photos') {
+    try {
+        if (!base64Data || !base64Data.startsWith('data:image')) return base64Data; // Already a URL or null
+
+        const filename = `${folder}/${Date.now()}-${Math.floor(Math.random() * 10000)}.jpg`;
+        const storageRef = storage.ref().child(filename);
+        
+        // Upload string
+        const snapshot = await storageRef.putString(base64Data, 'data_url');
+        // Get public URL
+        const downloadURL = await snapshot.ref.getDownloadURL();
+        return downloadURL;
+    } catch (e) {
+        console.warn('Firebase Storage upload failed:', e);
+        return null;
+    }
+}
+
+console.log('🔥 Firebase (Firestore + Storage) connected — diary-fafa');

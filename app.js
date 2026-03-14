@@ -312,12 +312,22 @@ function initDiary() {
             return;
         }
 
+        saveBtn.disabled = true;
+        showToast('Menyimpan...', 'info');
+
+        let photoUrl = attachedPhoto;
+        // Upload photo to Firebase Storage if exists and is local base64
+        if (photoUrl && typeof dbUploadImage === 'function' && photoUrl.startsWith('data:image')) {
+            const uploadedUrl = await dbUploadImage(photoUrl, 'diary');
+            if (uploadedUrl) photoUrl = uploadedUrl;
+        }
+
         const entry = {
             id: Date.now(),
             title: title || 'Tanpa Judul',
             content,
             mood: selectedMood || '💭',
-            photo: attachedPhoto || null,
+            photo: photoUrl || null,
             date: new Date().toISOString()
         };
 
@@ -326,11 +336,13 @@ function initDiary() {
         entries.unshift(entry);
         saveData('diary_entries', entries);
 
-        // Save to Firestore (without photo — too large)
-        const firestoreEntry = { ...entry, photo: null };
-        dbSave('diary_entries', String(entry.id), firestoreEntry);
+        // Save to Firestore (now with public photo URL)
+        if (typeof dbSave === 'function') {
+            dbSave('diary_entries', String(entry.id), entry);
+        }
 
         // Reset
+        saveBtn.disabled = false;
         titleInput.value = '';
         contentInput.value = '';
         charCount.textContent = '0';
@@ -494,22 +506,102 @@ function initGallery() {
         reader.readAsDataURL(file);
     }
 
-    savePhotoBtn.addEventListener('click', () => {
+    savePhotoBtn.addEventListener('click', async () => {
         if (!pendingPhoto) return;
-        const photos = getData('gallery_photos');
-        photos.unshift({
+        savePhotoBtn.disabled = true;
+        showToast('Mengupload foto... ⏳', 'info');
+
+        let photoUrl = pendingPhoto;
+        // Upload to Firebase Storage
+        if (typeof dbUploadImage === 'function' && photoUrl.startsWith('data:image')) {
+            const uploadedUrl = await dbUploadImage(photoUrl, 'gallery');
+            if (uploadedUrl) photoUrl = uploadedUrl;
+        }
+
+        const photoObj = {
             id: Date.now(),
-            src: pendingPhoto,
+            src: photoUrl,
             caption: photoCaption.value.trim() || '',
             date: new Date().toISOString()
-        });
+        };
+
+        // Save local
+        const photos = getData('gallery_photos');
+        photos.unshift(photoObj);
         saveData('gallery_photos', photos);
+
+        // Save cloud
+        if (typeof dbSave === 'function') {
+            dbSave('gallery_photos', String(photoObj.id), photoObj);
+        }
+
+        savePhotoBtn.disabled = false;
         resetGalleryForm();
         showToast('Foto tersimpan! 📸');
         renderGallery();
         // Auto refresh
         setTimeout(() => window.location.reload(), 800);
     });
+
+    // Real-time listener for gallery
+    if (typeof dbListen === 'function') {
+        dbListen('gallery_photos', (cloudPhotos) => {
+            if (!cloudPhotos || !cloudPhotos.length) return;
+            const localPhotos = getData('gallery_photos');
+            const localIds = new Set(localPhotos.map(p => String(p.id)));
+            let merged = [...localPhotos];
+            let changed = false;
+
+            cloudPhotos.forEach(cp => {
+                if (!localIds.has(String(cp.id))) {
+                    merged.push(cp);
+                    changed = true;
+                }
+            });
+
+            // Remove entries deleted from cloud
+            const cloudIds = new Set(cloudPhotos.map(p => String(p.id)));
+            const beforeLen = merged.length;
+            merged = merged.filter(p => cloudIds.has(String(p.id)) || !localIds.has(String(p.id)));
+            if (merged.length !== beforeLen) changed = true;
+
+            if (changed) {
+                merged.sort((a, b) => new Date(b.date) - new Date(a.date));
+                saveData('gallery_photos', merged);
+                renderGallery();
+            }
+        });
+    }
+
+    // Initial load from cloud
+    async function initGalleryCloud() {
+        if (typeof dbLoadAll !== 'function') return;
+        try {
+            const cloudPhotos = await dbLoadAll('gallery_photos', 'date', 'desc');
+            if (!cloudPhotos || !cloudPhotos.length) return;
+            
+            const localPhotos = getData('gallery_photos');
+            const localIds = new Set(localPhotos.map(p => String(p.id)));
+            let merged = [...localPhotos];
+            let changed = false;
+
+            cloudPhotos.forEach(cp => {
+                if (!localIds.has(String(cp.id))) {
+                    merged.push(cp);
+                    changed = true;
+                }
+            });
+
+            if (changed) {
+                merged.sort((a, b) => new Date(b.date) - new Date(a.date));
+                saveData('gallery_photos', merged);
+                renderGallery();
+            }
+        } catch (err) {
+            console.warn('Failed to load gallery from cloud:', err);
+        }
+    }
+    initGalleryCloud();
 
     cancelBtn.addEventListener('click', resetGalleryForm);
 
@@ -557,6 +649,10 @@ function deletePhoto(id) {
     let photos = getData('gallery_photos');
     photos = photos.filter(p => p.id !== id);
     saveData('gallery_photos', photos);
+    // Delete from Firestore
+    if (typeof dbDelete === 'function') {
+        dbDelete('gallery_photos', String(id));
+    }
     showToast('Foto dihapus', 'info');
     renderGallery();
 }
