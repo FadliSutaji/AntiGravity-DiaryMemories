@@ -208,8 +208,8 @@ function initMusic() {
     let isPlaying = false;
 
     const songs = {
-        '1': 'Music/dj song.mp3',
-        '2': 'Music/sad song.mp3'
+        '1': 'music/sad song.mp3',
+        '2': 'music/dj song.mp3'
     };
 
     // Load saved song preference
