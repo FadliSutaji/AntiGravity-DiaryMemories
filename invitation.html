@@ -216,6 +216,11 @@
     <!-- Toast -->
     <div class="toast-container" id="toastContainer"></div>
 
+    <!-- Firebase SDK (compat CDN) -->
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+
     <script>
         // Theme
         const saved = localStorage.getItem('diary_theme') || 'dark';
@@ -244,18 +249,34 @@
         }
 
         // Load saved date
-        const datePick = localStorage.getItem('diary_date_pick');
-        if (datePick) {
-            document.getElementById('inviteDate').textContent = `Tanggal ${datePick} bulan ini 💜`;
-        }
+        async function loadInviteData() {
+            let dateVal = localStorage.getItem('diary_date_pick');
+            let rsvpVal = localStorage.getItem('diary_rsvp');
 
-        // Load saved RSVP
-        const rsvpSaved = localStorage.getItem('diary_rsvp');
-        if (rsvpSaved) {
-            document.getElementById('rsvpStatus').textContent = rsvpSaved === 'yes'
-                ? 'yaaayyyyy'
-                : ''; // Removed 'moh🥺' as it's handled by taunt now
+            if (typeof dbLoad === 'function') {
+                const cloudDate = await dbLoad('settings', 'date_pick');
+                if (cloudDate && cloudDate.value) {
+                    dateVal = cloudDate.value;
+                    localStorage.setItem('diary_date_pick', dateVal);
+                }
+                const cloudRsvp = await dbLoad('settings', 'rsvp');
+                if (cloudRsvp && cloudRsvp.value) {
+                    rsvpVal = cloudRsvp.value;
+                    localStorage.setItem('diary_rsvp', rsvpVal);
+                }
+            }
+
+            if (dateVal) {
+                document.getElementById('inviteDate').textContent = `Tanggal ${dateVal} bulan ini 💜`;
+            }
+
+            if (rsvpVal) {
+                document.getElementById('rsvpStatus').textContent = rsvpVal === 'yes'
+                    ? 'yaaayyyyy'
+                    : '';
+            }
         }
+        loadInviteData();
 
         // RSVP — runaway no button!
         let noAttempts = 0;
@@ -306,6 +327,10 @@
         function rsvpAnswer(answer) {
             if (answer !== 'yes') return; // Only yes works
             localStorage.setItem('diary_rsvp', 'yes');
+            if (typeof dbSave === 'function') {
+                dbSave('settings', 'rsvp', { value: 'yes' });
+            }
+
             const popup = document.getElementById('rsvpPopup');
             const emoji = document.getElementById('rsvpEmoji');
             const title = document.getElementById('rsvpTitle');

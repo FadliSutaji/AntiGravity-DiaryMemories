@@ -357,6 +357,9 @@ function saveData(key, data) {
     localStorage.setItem(key, JSON.stringify(data));
 }
 
+// Firestore sync keys (data that should sync across devices)
+const SYNC_KEYS = ['diary_entries'];
+
 function showToast(message, type = 'success') {
     const container = document.getElementById('toastContainer');
     const icons = { success: '✅', error: '❌', info: '💜' };
@@ -429,7 +432,7 @@ function initDiary() {
     });
 
     // Save
-    saveBtn.addEventListener('click', () => {
+    saveBtn.addEventListener('click', async () => {
         const title = titleInput.value.trim();
         const content = contentInput.value.trim();
 
@@ -439,16 +442,23 @@ function initDiary() {
             return;
         }
 
-        const entries = getData('diary_entries');
-        entries.unshift({
+        const entry = {
             id: Date.now(),
             title: title || 'Tanpa Judul',
             content,
             mood: selectedMood || '💭',
             photo: attachedPhoto || null,
             date: new Date().toISOString()
-        });
+        };
+
+        // Save to localStorage
+        const entries = getData('diary_entries');
+        entries.unshift(entry);
         saveData('diary_entries', entries);
+
+        // Save to Firestore (without photo — too large)
+        const firestoreEntry = { ...entry, photo: null };
+        dbSave('diary_entries', String(entry.id), firestoreEntry);
 
         // Reset
         titleInput.value = '';
@@ -464,6 +474,50 @@ function initDiary() {
         renderDiaryEntries();
     });
 
+    // Load from Firestore on init (merge with local)
+    loadDiaryFromCloud();
+    renderDiaryEntries();
+
+    // Real-time listener for cross-device sync
+    if (typeof dbListen === 'function') {
+        dbListen('diary_entries', (cloudEntries) => {
+            const localEntries = getData('diary_entries');
+            const localIds = new Set(localEntries.map(e => e.id));
+            let merged = [...localEntries];
+            let changed = false;
+            cloudEntries.forEach(ce => {
+                if (!localIds.has(ce.id)) {
+                    merged.push(ce);
+                    changed = true;
+                }
+            });
+            // Remove entries deleted from cloud
+            const cloudIds = new Set(cloudEntries.map(e => e.id));
+            const beforeLen = merged.length;
+            merged = merged.filter(e => cloudIds.has(e.id) || !localIds.has(e.id));
+            if (merged.length !== beforeLen) changed = true;
+
+            if (changed) {
+                merged.sort((a, b) => new Date(b.date) - new Date(a.date));
+                saveData('diary_entries', merged);
+                renderDiaryEntries();
+            }
+        });
+    }
+}
+
+async function loadDiaryFromCloud() {
+    if (typeof dbLoadAll !== 'function') return;
+    const cloudEntries = await dbLoadAll('diary_entries', 'date', 'desc');
+    if (!cloudEntries.length) return;
+    const localEntries = getData('diary_entries');
+    const localIds = new Set(localEntries.map(e => e.id));
+    let merged = [...localEntries];
+    cloudEntries.forEach(ce => {
+        if (!localIds.has(ce.id)) merged.push(ce);
+    });
+    merged.sort((a, b) => new Date(b.date) - new Date(a.date));
+    saveData('diary_entries', merged);
     renderDiaryEntries();
 }
 
@@ -504,6 +558,8 @@ function deleteDiaryEntry(id) {
     let entries = getData('diary_entries');
     entries = entries.filter(e => e.id !== id);
     saveData('diary_entries', entries);
+    // Delete from Firestore too
+    dbDelete('diary_entries', String(id));
     showToast('Cerita dihapus', 'info');
     renderDiaryEntries();
 }
@@ -722,8 +778,9 @@ function pickNumber(num) {
     const popup = document.getElementById('pickPopup');
     const msg = document.getElementById('pickMsg');
 
-    // Save choice
+    // Save choice locally + Firestore
     localStorage.setItem('diary_date_pick', num);
+    dbSave('settings', 'date_pick', { value: num });
 
     msg.textContent = `Kamu pilih tanggal ${num}! Siap-siap ya beb 💜`;
     popup.classList.add('active');
@@ -750,8 +807,16 @@ function showDateBanner(num) {
 }
 
 // Load saved date pick on page load (called from initDate)
-function loadDatePick() {
-    const saved = localStorage.getItem('diary_date_pick');
+async function loadDatePick() {
+    // Try Firestore first, fallback to localStorage
+    let saved = localStorage.getItem('diary_date_pick');
+    if (typeof dbLoad === 'function') {
+        const cloud = await dbLoad('settings', 'date_pick');
+        if (cloud && cloud.value) {
+            saved = cloud.value;
+            localStorage.setItem('diary_date_pick', saved);
+        }
+    }
     if (saved) showDateBanner(saved);
 }
 
@@ -761,6 +826,9 @@ function loadDatePick() {
 function clearDatePick() {
     localStorage.removeItem('diary_date_pick');
     localStorage.removeItem('diary_rsvp');
+    // Clear from Firestore
+    dbDelete('settings', 'date_pick');
+    dbDelete('settings', 'rsvp');
 
     const banner = document.getElementById('dateBanner');
     const clearBtn = document.getElementById('clearDateBtn');
