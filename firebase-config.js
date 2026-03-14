@@ -52,7 +52,7 @@ async function dbDelete(collection, docId) {
 }
 
 // Load all documents from a collection (ordered by timestamp desc)
-async function dbLoadAll(collection, orderField = 'timestamp', dir = 'desc') {
+async function dbLoadAll(collection, orderField = 'date', dir = 'desc') {
     try {
         const snapshot = await db.collection(collection).orderBy(orderField, dir).get();
         return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -63,7 +63,7 @@ async function dbLoadAll(collection, orderField = 'timestamp', dir = 'desc') {
 }
 
 // Real-time listener for a collection
-function dbListen(collection, callback, orderField = 'timestamp', dir = 'desc') {
+function dbListen(collection, callback, orderField = 'date', dir = 'desc') {
     return db.collection(collection).orderBy(orderField, dir).onSnapshot(
         snapshot => {
             const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));

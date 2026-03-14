@@ -365,40 +365,21 @@ function initDiary() {
     // Real-time listener for cross-device sync
     if (typeof dbListen === 'function') {
         dbListen('diary_entries', (cloudEntries) => {
-            if (!cloudEntries || !cloudEntries.length) return;
+            if (!cloudEntries) return;
+            
+            // Check if we gained new entries from the cloud
             const localEntries = getData('diary_entries');
-            const localIds = new Set(localEntries.map(e => String(e.id)));
-            let merged = [...localEntries];
-            let changed = false;
+            const hasNewRemoteData = cloudEntries.length > localEntries.length;
 
-            cloudEntries.forEach(ce => {
-                if (!localIds.has(String(ce.id))) {
-                    merged.push(ce);
-                    changed = true;
-                }
-            });
-
-            // Remove entries deleted from cloud
-            const cloudIds = new Set(cloudEntries.map(e => String(e.id)));
-            const beforeLen = merged.length;
-            merged = merged.filter(e => cloudIds.has(String(e.id)) || !localIds.has(String(e.id)));
-            if (merged.length !== beforeLen) changed = true;
-
-            if (changed) {
-                merged.sort((a, b) => new Date(b.date) - new Date(a.date));
-                saveData('diary_entries', merged);
-                renderDiaryEntries();
-                
-                // If it was triggered by a remote change (not the initial load), 
-                // refresh to show the new data as requested by user.
-                // We use a small timeout to avoid chaotic reload loops during initial sync
+            // Always trust the cloud as the source of truth for synced entries
+            saveData('diary_entries', cloudEntries);
+            renderDiaryEntries();
+            
+            // If another device added data, trigger a soft reload so they see it instantly
+            if (hasNewRemoteData) {
                 clearTimeout(window._remoteReloadDiaryTimeout);
                 window._remoteReloadDiaryTimeout = setTimeout(() => {
-                    const localEntriesBeforeSync = getData('diary_entries');
-                    // Only reload if we actually received NEW data from cloud that we didn't have locally
-                    if(merged.length > localEntriesBeforeSync.length) {
-                         window.location.reload();
-                    }
+                    window.location.reload();
                 }, 500);
             }
         });
@@ -568,37 +549,21 @@ function initGallery() {
     // Real-time listener for gallery
     if (typeof dbListen === 'function') {
         dbListen('gallery_photos', (cloudPhotos) => {
-            if (!cloudPhotos || !cloudPhotos.length) return;
+            if (!cloudPhotos) return;
+
+            // Check if we gained new entries from the cloud
             const localPhotos = getData('gallery_photos');
-            const localIds = new Set(localPhotos.map(p => String(p.id)));
-            let merged = [...localPhotos];
-            let changed = false;
+            const hasNewRemoteData = cloudPhotos.length > localPhotos.length;
 
-            cloudPhotos.forEach(cp => {
-                if (!localIds.has(String(cp.id))) {
-                    merged.push(cp);
-                    changed = true;
-                }
-            });
+            // Always trust the cloud as the source of truth
+            saveData('gallery_photos', cloudPhotos);
+            renderGallery();
 
-            // Remove entries deleted from cloud
-            const cloudIds = new Set(cloudPhotos.map(p => String(p.id)));
-            const beforeLen = merged.length;
-            merged = merged.filter(p => cloudIds.has(String(p.id)) || !localIds.has(String(p.id)));
-            if (merged.length !== beforeLen) changed = true;
-
-            if (changed) {
-                merged.sort((a, b) => new Date(b.date) - new Date(a.date));
-                saveData('gallery_photos', merged);
-                renderGallery();
-
-                // Reload on remote changes
+            // Reload on remote changes
+            if (hasNewRemoteData) {
                 clearTimeout(window._remoteReloadGalleryTimeout);
                 window._remoteReloadGalleryTimeout = setTimeout(() => {
-                    const localPhotosBeforeSync = getData('gallery_photos');
-                    if(merged.length > localPhotosBeforeSync.length) {
-                         window.location.reload();
-                    }
+                    window.location.reload();
                 }, 500);
             }
         });
