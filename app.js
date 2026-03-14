@@ -481,20 +481,23 @@ function initDiary() {
     // Real-time listener for cross-device sync
     if (typeof dbListen === 'function') {
         dbListen('diary_entries', (cloudEntries) => {
+            if (!cloudEntries || !cloudEntries.length) return;
             const localEntries = getData('diary_entries');
-            const localIds = new Set(localEntries.map(e => e.id));
+            const localIds = new Set(localEntries.map(e => String(e.id)));
             let merged = [...localEntries];
             let changed = false;
+
             cloudEntries.forEach(ce => {
-                if (!localIds.has(ce.id)) {
+                if (!localIds.has(String(ce.id))) {
                     merged.push(ce);
                     changed = true;
                 }
             });
+
             // Remove entries deleted from cloud
-            const cloudIds = new Set(cloudEntries.map(e => e.id));
+            const cloudIds = new Set(cloudEntries.map(e => String(e.id)));
             const beforeLen = merged.length;
-            merged = merged.filter(e => cloudIds.has(e.id) || !localIds.has(e.id));
+            merged = merged.filter(e => cloudIds.has(String(e.id)) || !localIds.has(String(e.id)));
             if (merged.length !== beforeLen) changed = true;
 
             if (changed) {
@@ -508,17 +511,30 @@ function initDiary() {
 
 async function loadDiaryFromCloud() {
     if (typeof dbLoadAll !== 'function') return;
-    const cloudEntries = await dbLoadAll('diary_entries', 'date', 'desc');
-    if (!cloudEntries.length) return;
-    const localEntries = getData('diary_entries');
-    const localIds = new Set(localEntries.map(e => e.id));
-    let merged = [...localEntries];
-    cloudEntries.forEach(ce => {
-        if (!localIds.has(ce.id)) merged.push(ce);
-    });
-    merged.sort((a, b) => new Date(b.date) - new Date(a.date));
-    saveData('diary_entries', merged);
-    renderDiaryEntries();
+    try {
+        const cloudEntries = await dbLoadAll('diary_entries', 'date', 'desc');
+        if (!cloudEntries || !cloudEntries.length) return;
+        
+        const localEntries = getData('diary_entries');
+        const localIds = new Set(localEntries.map(e => String(e.id)));
+        let merged = [...localEntries];
+        let changed = false;
+
+        cloudEntries.forEach(ce => {
+            if (!localIds.has(String(ce.id))) {
+                merged.push(ce);
+                changed = true;
+            }
+        });
+
+        if (changed) {
+            merged.sort((a, b) => new Date(b.date) - new Date(a.date));
+            saveData('diary_entries', merged);
+            renderDiaryEntries();
+        }
+    } catch (err) {
+        console.warn('Failed to load diary from cloud:', err);
+    }
 }
 
 function renderDiaryEntries() {

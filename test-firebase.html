@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Firebase Test</title>
+</head>
+<body>
+    <h1>Firebase Test</h1>
+    <button id="writeBtn">Write to Firestore</button>
+    <button id="readBtn">Read from Firestore</button>
+    <pre id="output"></pre>
+
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+
+    <script>
+        const output = document.getElementById('output');
+        const dbRef = firebase.firestore();
+
+        document.getElementById('writeBtn').onclick = async () => {
+            try {
+                output.innerText = 'Writing...';
+                await dbRef.collection('test').doc('ping').set({ timestamp: new Date(), message: 'Hello from test!' });
+                output.innerText = 'Write successful!\n' + new Date();
+            } catch (err) {
+                output.innerText = 'Write failed: ' + err.message;
+            }
+        };
+
+        document.getElementById('readBtn').onclick = async () => {
+            try {
+                output.innerText = 'Reading...';
+                const doc = await dbRef.collection('test').doc('ping').get();
+                if (doc.exists) {
+                    output.innerText = 'Read successful:\n' + JSON.stringify(doc.data(), null, 2);
+                } else {
+                    output.innerText = 'Document does not exist.';
+                }
+            } catch (err) {
+                output.innerText = 'Read failed: ' + err.message;
+            }
+        };
+    </script>
+</body>
+</html>
