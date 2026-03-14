@@ -4,10 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>💌 Date Invitation — Kamu Diundang!</title>
+    <title>💌 Date Invitation — mamm</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap"
+    <link
+        href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <style>
@@ -102,14 +103,29 @@
         }
 
         @keyframes heartFloat {
-            0% { opacity: 0; transform: translateY(100vh) rotate(0deg) scale(0.5); }
-            10% { opacity: 0.4; }
-            90% { opacity: 0.1; }
-            100% { opacity: 0; transform: translateY(-10vh) rotate(360deg) scale(1); }
+            0% {
+                opacity: 0;
+                transform: translateY(100vh) rotate(0deg) scale(0.5);
+            }
+
+            10% {
+                opacity: 0.4;
+            }
+
+            90% {
+                opacity: 0.1;
+            }
+
+            100% {
+                opacity: 0;
+                transform: translateY(-10vh) rotate(360deg) scale(1);
+            }
         }
 
         @media (max-width: 480px) {
-            .invite-page-title { font-size: 2rem; }
+            .invite-page-title {
+                font-size: 2rem;
+            }
         }
     </style>
 </head>
@@ -129,7 +145,7 @@
             <div class="invite-page-header">
                 <span class="invite-page-tag">💌 You're Invited</span>
                 <h1 class="invite-page-title">Date <span class="accent">Invitation</span></h1>
-                <p class="invite-page-desc">Sebuah undangan spesial buat kamu 💜</p>
+                <p class="invite-page-desc">can't wait! 💜</p>
             </div>
 
             <div class="invitation-card glass-card cute-card">
@@ -138,8 +154,8 @@
 
                 <div class="invite-header">
                     <div class="invite-envelope">💌</div>
-                    <h3 class="invite-title">Kamu diundang untuk...</h3>
-                    <p class="invite-subtitle">hangout bareng akuuu 💜</p>
+                    <h3 class="invite-title">beb kt harus</h3>
+                    <p class="invite-subtitle">mammmmm</p>
                 </div>
 
                 <div class="invite-details">
@@ -155,7 +171,7 @@
                         <div class="invite-icon">📍</div>
                         <div class="invite-info">
                             <span class="invite-label">Tempat</span>
-                            <span class="invite-value">Rahasia, nanti aku kasih tau 🤫</span>
+                            <span class="invite-value">yantooverse</span>
                         </div>
                     </div>
 
@@ -163,21 +179,24 @@
                         <div class="invite-icon">👗</div>
                         <div class="invite-info">
                             <span class="invite-label">Dresscode</span>
-                            <span class="invite-value">Yang penting cantik kayak biasa 💅</span>
+                            <span class="invite-value">opo wae tetep gemaayyy💜</span>
                         </div>
                     </div>
                 </div>
 
                 <div class="invite-rsvp">
-                    <p class="rsvp-question">Bisa dateng kan? 🥺</p>
-                    <div class="rsvp-buttons">
-                        <button class="btn btn-primary btn-glow" onclick="rsvpAnswer('yes')">
-                            Iya dong! 💜
+                    <p class="rsvp-question" id="rsvpQuestion">oke? ok? o k ? 🥺</p>
+                    <div class="rsvp-buttons" id="rsvpArea" style="position:relative; min-height:80px;">
+                        <button class="btn btn-primary btn-glow" id="rsvpYes" onclick="rsvpAnswer('yes')">
+                            y 💜
                         </button>
-                        <button class="btn btn-secondary" onclick="rsvpAnswer('no')">
-                            Hmm gatau 😢
+                        <button class="btn btn-secondary" id="rsvpNo" style="transition: all 0.3s ease;">
+                            mbuh
                         </button>
                     </div>
+                    <p class="rsvp-taunt" id="rsvpTaunt"
+                        style="display:none; font-family:var(--font-handwriting); color:var(--pink-light); font-size:1.1rem; margin-top:0.75rem;">
+                    </p>
                     <p class="rsvp-status" id="rsvpStatus"></p>
                 </div>
             </div>
@@ -209,7 +228,7 @@
             p.className = 'particle';
             const size = Math.random() * 4 + 1;
             const colors = ['#a855f7', '#c084fc', '#ec4899', '#f472b6', '#818cf8'];
-            p.style.cssText = `left:${Math.random()*100}%;width:${size}px;height:${size}px;background:${colors[Math.floor(Math.random()*colors.length)]};animation-duration:${Math.random()*15+10}s;animation-delay:${Math.random()*10}s;`;
+            p.style.cssText = `left:${Math.random() * 100}%;width:${size}px;height:${size}px;background:${colors[Math.floor(Math.random() * colors.length)]};animation-duration:${Math.random() * 15 + 10}s;animation-delay:${Math.random() * 10}s;`;
             pc.appendChild(p);
         }
 
@@ -220,7 +239,7 @@
             const h = document.createElement('div');
             h.className = 'floating-heart';
             h.textContent = hearts[Math.floor(Math.random() * hearts.length)];
-            h.style.cssText = `left:${Math.random()*100}%;font-size:${Math.random()*1.5+0.8}rem;animation-duration:${Math.random()*12+8}s;animation-delay:${Math.random()*8}s;`;
+            h.style.cssText = `left:${Math.random() * 100}%;font-size:${Math.random() * 1.5 + 0.8}rem;animation-duration:${Math.random() * 12 + 8}s;animation-delay:${Math.random() * 8}s;`;
             hc.appendChild(h);
         }
 
@@ -234,30 +253,70 @@
         const rsvpSaved = localStorage.getItem('diary_rsvp');
         if (rsvpSaved) {
             document.getElementById('rsvpStatus').textContent = rsvpSaved === 'yes'
-                ? 'Kamu udah confirm dateng! 💜 See you beb!'
-                : 'Yaudah gapapa, tapi aku tetep nunggu ya 🥺';
+                ? 'yaaayyyyy'
+                : ''; // Removed 'moh🥺' as it's handled by taunt now
         }
 
-        // RSVP
+        // RSVP — runaway no button!
+        let noAttempts = 0;
+        const taunts = [
+            'Eits, ga bisa pencet! 😜',
+            'Coba lagi dong wkwk 😂',
+            'Udah deh, pencet yg iya aja 💜'
+        ];
+        const noBtn = document.getElementById('rsvpNo');
+        const rsvpArea = document.getElementById('rsvpArea');
+        const tauntEl = document.getElementById('rsvpTaunt');
+
+        function dodgeNoButton() {
+            noAttempts++;
+
+            // Show taunt message
+            tauntEl.style.display = 'block';
+            tauntEl.textContent = taunts[Math.min(noAttempts - 1, taunts.length - 1)];
+
+            if (noAttempts >= 3) {
+                // 3rd attempt: button disappears
+                noBtn.style.transform = 'scale(0) rotate(180deg)';
+                noBtn.style.opacity = '0';
+                setTimeout(() => {
+                    noBtn.style.display = 'none';
+                    tauntEl.textContent = 'yoes raksi beb💜';
+                }, 300);
+                return;
+            }
+
+            // Move button to random position
+            const areaRect = rsvpArea.getBoundingClientRect();
+            const maxX = areaRect.width - noBtn.offsetWidth;
+            const maxY = 60;
+            const randX = Math.random() * maxX - maxX / 2;
+            const randY = -(Math.random() * maxY + 20);
+            noBtn.style.transform = `translate(${randX}px, ${randY}px) rotate(${Math.random() * 30 - 15}deg)`;
+        }
+
+        // Desktop: hover triggers dodge
+        noBtn.addEventListener('mouseenter', dodgeNoButton);
+        // Mobile: touch triggers dodge
+        noBtn.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            dodgeNoButton();
+        });
+
         function rsvpAnswer(answer) {
-            localStorage.setItem('diary_rsvp', answer);
+            if (answer !== 'yes') return; // Only yes works
+            localStorage.setItem('diary_rsvp', 'yes');
             const popup = document.getElementById('rsvpPopup');
             const emoji = document.getElementById('rsvpEmoji');
             const title = document.getElementById('rsvpTitle');
             const msg = document.getElementById('rsvpMsg');
             const status = document.getElementById('rsvpStatus');
 
-            if (answer === 'yes') {
-                emoji.textContent = '🥰';
-                title.textContent = 'Yeay! Makasih beb!';
-                msg.textContent = 'Aku udah ga sabar ketemu kamu! Siap-siap ya 💜';
-                status.textContent = 'Kamu udah confirm dateng! 💜 See you beb!';
-            } else {
-                emoji.textContent = '🥺';
-                title.textContent = 'Yahhh...';
-                msg.textContent = 'Gapapa beb, tapi aku tetep nunggu kamu ya... 🥺💜';
-                status.textContent = 'Yaudah gapapa, tapi aku tetep nunggu ya 🥺';
-            }
+            emoji.textContent = '🥰';
+            title.textContent = 'Yeay! so yummmyyyy!';
+            msg.textContent = 'lovvyouoooouuuuu 💜';
+            status.textContent = 'yaaaayyyy💜 lovvyouoooouuuuu';
+
             popup.classList.add('active');
             document.body.style.overflow = 'hidden';
         }

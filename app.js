@@ -741,64 +741,31 @@ function closePickPopup() {
 function showDateBanner(num) {
     const banner = document.getElementById('dateBanner');
     const text = document.getElementById('dateBannerText');
+    const clearBtn = document.getElementById('clearDateBtn');
     if (banner && text) {
-        text.textContent = `Date kita tanggal ${num} ya beb! 💜`;
+        text.textContent = `Date kita tanggal ${num} ya beb! Lihat undangan →`;
         banner.style.display = 'inline-flex';
     }
-
-    // Also update invitation date
-    const inviteDate = document.getElementById('inviteDate');
-    if (inviteDate) {
-        inviteDate.textContent = `Tanggal ${num} bulan ini 💜`;
-    }
+    if (clearBtn) clearBtn.style.display = 'block';
 }
 
 // Load saved date pick on page load (called from initDate)
 function loadDatePick() {
     const saved = localStorage.getItem('diary_date_pick');
     if (saved) showDateBanner(saved);
-
-    // Load saved RSVP
-    const rsvp = localStorage.getItem('diary_rsvp');
-    if (rsvp) {
-        const status = document.getElementById('rsvpStatus');
-        if (status) {
-            status.textContent = rsvp === 'yes'
-                ? 'Kamu udah confirm dateng! 💜 See you beb!'
-                : 'Yaudah gapapa, tapi aku tetep nunggu ya 🥺';
-        }
-    }
 }
 
 /* ========================================
-   RSVP (Date Invitation)
+   CLEAR DATE PICK
    ======================================== */
-function rsvpAnswer(answer) {
-    localStorage.setItem('diary_rsvp', answer);
+function clearDatePick() {
+    localStorage.removeItem('diary_date_pick');
+    localStorage.removeItem('diary_rsvp');
 
-    const popup = document.getElementById('rsvpPopup');
-    const emoji = document.getElementById('rsvpEmoji');
-    const title = document.getElementById('rsvpTitle');
-    const msg = document.getElementById('rsvpMsg');
-    const status = document.getElementById('rsvpStatus');
+    const banner = document.getElementById('dateBanner');
+    const clearBtn = document.getElementById('clearDateBtn');
+    if (banner) banner.style.display = 'none';
+    if (clearBtn) clearBtn.style.display = 'none';
 
-    if (answer === 'yes') {
-        emoji.textContent = '🥰';
-        title.textContent = 'Yeay! Makasih beb!';
-        msg.textContent = 'Aku udah ga sabar ketemu kamu! Siap-siap ya 💜';
-        if (status) status.textContent = 'Kamu udah confirm dateng! 💜 See you beb!';
-    } else {
-        emoji.textContent = '🥺';
-        title.textContent = 'Yahhh...';
-        msg.textContent = 'Gapapa beb, tapi aku tetep nunggu kamu ya... 🥺💜';
-        if (status) status.textContent = 'Yaudah gapapa, tapi aku tetep nunggu ya 🥺';
-    }
-
-    popup.classList.add('active');
-    document.body.style.overflow = 'hidden';
-}
-
-function closeRsvpPopup() {
-    document.getElementById('rsvpPopup').classList.remove('active');
-    document.body.style.overflow = '';
+    showToast('Tanggal dihapus, pilih lagi di bawah ya!', 'info');
 }

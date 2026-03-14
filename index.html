@@ -104,7 +104,7 @@
                 <a href="#diary" class="nav-link" data-section="diary">Diary</a>
                 <a href="#gallery" class="nav-link" data-section="gallery">Galeri</a>
                 <a href="#recap" class="nav-link" data-section="recap">Recap</a>
-                <a href="#invitation" class="nav-link" data-section="invitation">Undangan</a>
+                <a href="invitation.html" class="nav-link">Undangan 💌</a>
             </div>
             <div class="nav-right">
                 <button class="theme-toggle" id="themeToggle" title="Toggle Light/Dark">
@@ -122,7 +122,7 @@
             <a href="#diary" class="mobile-link" data-section="diary">Diary</a>
             <a href="#gallery" class="mobile-link" data-section="gallery">Galeri</a>
             <a href="#recap" class="mobile-link" data-section="recap">Recap</a>
-            <a href="#invitation" class="mobile-link" data-section="invitation">Undangan</a>
+            <a href="invitation.html" class="mobile-link">Undangan 💌</a>
 
         </div>
 
@@ -146,10 +146,13 @@
                     <a href="#diary" class="btn btn-primary">Tulis Diary 📝</a>
                     <a href="#gallery" class="btn btn-secondary">Galeri Foto 📸</a>
                 </div>
-                <div class="date-banner" id="dateBanner" style="display:none;">
+                <a href="invitation.html" class="date-banner" id="dateBanner" style="display:none;">
                     <span class="date-banner-icon">💜</span>
                     <span class="date-banner-text" id="dateBannerText"></span>
-                </div>
+                    <span class="date-banner-arrow">→</span>
+                </a>
+                <button class="btn-clear-date" id="clearDateBtn" style="display:none;" onclick="clearDatePick()">✕ Hapus
+                    tanggal</button>
                 <div class="hero-date">
                     <span id="currentDate"></span>
                 </div>
@@ -271,7 +274,7 @@
                     <div class="cute-sticker cute-sticker-2">💜</div>
                     <div class="video-container" id="videoContainer">
                         <video id="recapVideo" preload="metadata">
-                            <source src="music/recap.mp4" type="video/mp4">
+                            <source src="music/2026-03-15-005735548.mp4" type="video/mp4">
                             Browser kamu tidak mendukung video.
                         </video>
                         <div class="video-play-overlay" id="videoPlayOverlay">
@@ -286,77 +289,6 @@
                 </div>
             </div>
         </section>
-
-        <!-- ===== DATE INVITATION SECTION ===== -->
-        <section class="section invitation-section" id="invitation">
-            <div class="container">
-                <div class="section-header">
-                    <span class="section-tag">💌 You're Invited</span>
-                    <h2 class="section-title">Date <span class="accent">Invitation</span></h2>
-                    <p class="section-desc">Sebuah undangan spesial buat kamu 💜</p>
-                </div>
-
-                <div class="invitation-card glass-card cute-card">
-                    <div class="cute-sticker cute-sticker-1">💌</div>
-                    <div class="cute-sticker cute-sticker-2">🌸</div>
-
-                    <div class="invite-header">
-                        <div class="invite-envelope">💌</div>
-                        <h3 class="invite-title">Kamu diundang untuk...</h3>
-                        <p class="invite-subtitle">hangout bareng akuuu 💜</p>
-                    </div>
-
-                    <div class="invite-details">
-                        <div class="invite-detail-item">
-                            <div class="invite-icon">📅</div>
-                            <div class="invite-info">
-                                <span class="invite-label">Tanggal</span>
-                                <span class="invite-value" id="inviteDate">Pilih dulu di bawah ya! ⬇️</span>
-                            </div>
-                        </div>
-
-                        <div class="invite-detail-item">
-                            <div class="invite-icon">📍</div>
-                            <div class="invite-info">
-                                <span class="invite-label">Tempat</span>
-                                <span class="invite-value">Rahasia, nanti aku kasih tau 🤫</span>
-                            </div>
-                        </div>
-
-                        <div class="invite-detail-item">
-                            <div class="invite-icon">👗</div>
-                            <div class="invite-info">
-                                <span class="invite-label">Dresscode</span>
-                                <span class="invite-value">Yang penting cantik kayak biasa 💅</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="invite-rsvp">
-                        <p class="rsvp-question">Bisa dateng kan? 🥺</p>
-                        <div class="rsvp-buttons">
-                            <button class="btn btn-primary btn-glow" id="rsvpYes" onclick="rsvpAnswer('yes')">
-                                Iya dong! 💜
-                            </button>
-                            <button class="btn btn-secondary" id="rsvpNo" onclick="rsvpAnswer('no')">
-                                Hmm gatau 😢
-                            </button>
-                        </div>
-                        <p class="rsvp-status" id="rsvpStatus"></p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- ===== RSVP Popup ===== -->
-        <div class="pick-popup-overlay" id="rsvpPopup">
-            <div class="pick-popup-card glass-card">
-                <div class="pick-popup-emoji" id="rsvpEmoji">💜</div>
-                <h3 class="pick-popup-title" id="rsvpTitle"></h3>
-                <p class="pick-popup-msg" id="rsvpMsg"></p>
-                <button class="btn btn-primary btn-sm" onclick="closeRsvpPopup()">Oke beb 💜</button>
-            </div>
-        </div>
 
         <!-- ===== FOOTER ===== -->
         <footer class="footer">
@@ -382,9 +314,9 @@
         <div class="pick-popup-overlay" id="pickPopup">
             <div class="pick-popup-card glass-card">
                 <div class="pick-popup-emoji">💜</div>
-                <h3 class="pick-popup-title">Makasih beb!</h3>
+                <h3 class="pick-popup-title">💜💜💜💜💜💜!</h3>
                 <p class="pick-popup-msg" id="pickMsg"></p>
-                <button class="btn btn-primary btn-sm" onclick="closePickPopup()">Oke sayang 💜</button>
+                <button class="btn btn-primary btn-sm" onclick="closePickPopup()">lovvyooouuut💜</button>
             </div>
         </div>
 
@@ -404,7 +336,7 @@
 
     <!-- Background Music -->
     <audio id="bgMusic" loop preload="auto">
-        <source src="music/lagu1.mp3" type="audio/mpeg">
+        <source src="music/sad song.mp3" type="audio/mpeg">
     </audio>
 
     <script src="app.js"></script>

@@ -1452,6 +1452,40 @@ body {
     color: var(--accent-light);
 }
 
+.date-banner-arrow {
+    font-size: 1.1rem;
+    color: var(--accent-light);
+    transition: var(--transition);
+}
+
+a.date-banner {
+    text-decoration: none;
+    cursor: pointer;
+}
+
+a.date-banner:hover .date-banner-arrow {
+    transform: translateX(4px);
+}
+
+.btn-clear-date {
+    display: block;
+    margin: 0.5rem auto 0;
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    font-family: var(--font-body);
+    cursor: pointer;
+    padding: 0.3rem 0.8rem;
+    border-radius: var(--radius-sm);
+    transition: var(--transition);
+}
+
+.btn-clear-date:hover {
+    color: #ef4444;
+    background: rgba(239, 68, 68, 0.1);
+}
+
 /* ========================================
    RESPONSIVE
    ======================================== */
