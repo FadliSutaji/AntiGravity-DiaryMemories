@@ -352,6 +352,117 @@ body {
 .music-toggle.playing .music-icon { display: none; }
 .music-toggle.playing .music-bars { display: flex; }
 
+/* Song switch button */
+.music-switch {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--bg-card);
+    border: 1px solid var(--border-glass);
+    cursor: pointer;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition);
+    margin-top: 0.5rem;
+    box-shadow: var(--shadow-card);
+}
+
+.music-switch:hover {
+    border-color: var(--accent);
+    transform: scale(1.1);
+}
+
+/* Song picker popup */
+.song-picker {
+    position: absolute;
+    bottom: 0;
+    left: 60px;
+    background: var(--bg-card);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--border-glass);
+    border-radius: var(--radius-md);
+    padding: 0.75rem;
+    min-width: 180px;
+    box-shadow: var(--shadow-card);
+    display: none;
+    flex-direction: column;
+    gap: 0.4rem;
+    animation: pickerIn 0.25s ease-out;
+}
+
+.song-picker.active {
+    display: flex;
+}
+
+@keyframes pickerIn {
+    from { opacity: 0; transform: translateX(-10px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+.song-picker-title {
+    font-family: var(--font-handwriting);
+    font-size: 1.1rem;
+    color: var(--accent-light);
+    margin-bottom: 0.25rem;
+    padding-left: 0.25rem;
+}
+
+.song-option {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: var(--radius-sm);
+    border: 1px solid transparent;
+    background: none;
+    color: var(--text-secondary);
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: var(--transition);
+    text-align: left;
+    width: 100%;
+}
+
+.song-option:hover {
+    background: rgba(168, 85, 247, 0.1);
+    color: var(--text-primary);
+}
+
+.song-option.active {
+    background: rgba(168, 85, 247, 0.15);
+    border-color: var(--accent);
+    color: var(--accent-light);
+}
+
+.song-num {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--gradient-primary);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 600;
+    flex-shrink: 0;
+}
+
+.song-option:not(.active) .song-num {
+    background: var(--border-glass);
+    color: var(--text-muted);
+}
+
+.song-name {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 /* ========================================
    THEME TOGGLE
    ======================================== */
@@ -855,6 +966,95 @@ body {
 .empty-state p { font-size: 0.9rem; }
 
 /* ========================================
+   VIDEO RECAP SECTION
+   ======================================== */
+.video-section {
+    background:
+        radial-gradient(ellipse at 50% 30%, rgba(168, 85, 247, 0.1) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 80%, rgba(236, 72, 153, 0.06) 0%, transparent 50%),
+        var(--bg-primary);
+}
+
+.video-wrapper {
+    padding: 1rem;
+}
+
+.video-container {
+    position: relative;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    background: #000;
+    aspect-ratio: 9 / 16;
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+.video-container video {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+    border-radius: var(--radius-md);
+}
+
+.video-play-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    background: rgba(0, 0, 0, 0.45);
+    cursor: pointer;
+    transition: var(--transition);
+    z-index: 2;
+}
+
+.video-play-overlay:hover {
+    background: rgba(0, 0, 0, 0.35);
+}
+
+.video-play-overlay:hover .play-btn-circle {
+    transform: scale(1.15);
+    box-shadow: 0 0 40px var(--accent-glow), 0 0 80px rgba(168, 85, 247, 0.15);
+}
+
+.play-btn-circle {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: var(--gradient-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 30px var(--accent-glow);
+    transition: var(--transition);
+    animation: playPulse 2.5s ease-in-out infinite;
+}
+
+.play-btn-circle svg {
+    margin-left: 4px;
+}
+
+@keyframes playPulse {
+    0%, 100% { box-shadow: 0 0 20px var(--accent-glow); }
+    50% { box-shadow: 0 0 40px var(--accent-glow), 0 0 60px rgba(168, 85, 247, 0.1); }
+}
+
+.play-label {
+    font-family: var(--font-handwriting);
+    font-size: 1.3rem;
+    color: white;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+.video-play-overlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* ========================================
    LOVE NOTES / PESAN SAYANG
    ======================================== */
 .love-section {
@@ -963,6 +1163,294 @@ body {
 .footer-quote p { font-family: var(--font-display); font-style: italic; font-size: 1.1rem; color: var(--text-secondary); line-height: 1.6; }
 .footer-brand { font-family: var(--font-handwriting); font-size: 1.3rem; color: var(--accent-light); margin-bottom: 0.5rem; }
 .footer-copy { font-size: 0.8rem; color: var(--text-muted); }
+
+/* ========================================
+   PICK NUMBER BUTTONS & POPUP
+   ======================================== */
+.pick-buttons {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.btn-pick {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: var(--gradient-primary);
+    color: white;
+    font-size: 1.4rem;
+    font-weight: 700;
+    font-family: var(--font-body);
+    border: none;
+    cursor: pointer;
+    transition: var(--transition);
+    box-shadow: 0 4px 20px var(--accent-glow);
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-pick::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    background: var(--gradient-love);
+    border-radius: 50%;
+    z-index: -1;
+    opacity: 0;
+    transition: var(--transition);
+    filter: blur(8px);
+}
+
+.btn-pick:hover {
+    transform: scale(1.15) rotate(-5deg);
+    box-shadow: 0 8px 30px var(--accent-glow);
+}
+
+.btn-pick:hover::before {
+    opacity: 0.6;
+}
+
+.btn-pick:active {
+    transform: scale(0.95);
+}
+
+.pick-or {
+    color: var(--text-muted);
+    font-family: var(--font-handwriting);
+    font-size: 1.2rem;
+}
+
+/* Pick Popup */
+.pick-popup-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+}
+
+.pick-popup-overlay.active {
+    display: flex;
+}
+
+.pick-popup-card {
+    text-align: center;
+    max-width: 350px;
+    width: 90%;
+    padding: 2.5rem 2rem;
+    animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes popIn {
+    from { opacity: 0; transform: scale(0.7) translateY(20px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.pick-popup-emoji {
+    font-size: 3.5rem;
+    margin-bottom: 0.75rem;
+    animation: pickBounce 1s ease-in-out infinite;
+}
+
+@keyframes pickBounce {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.2) rotate(10deg); }
+}
+
+.pick-popup-title {
+    font-family: var(--font-display);
+    font-size: 1.6rem;
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.75rem;
+}
+
+.pick-popup-msg {
+    color: var(--text-secondary);
+    font-size: 1rem;
+    margin-bottom: 1.5rem;
+    font-family: var(--font-handwriting);
+    font-size: 1.3rem;
+}
+
+/* ========================================
+   DATE INVITATION
+   ======================================== */
+.invitation-section {
+    background:
+        radial-gradient(ellipse at 30% 30%, rgba(236, 72, 153, 0.08) 0%, transparent 50%),
+        radial-gradient(ellipse at 70% 70%, rgba(168, 85, 247, 0.08) 0%, transparent 50%),
+        var(--bg-secondary);
+}
+
+.invitation-card {
+    max-width: 550px;
+    margin: 0 auto;
+    text-align: center;
+    border: 1.5px solid rgba(236, 72, 153, 0.2);
+}
+
+.invitation-card:hover {
+    border-color: rgba(236, 72, 153, 0.4);
+    box-shadow: 0 0 40px rgba(236, 72, 153, 0.1), var(--shadow-glow);
+}
+
+.invite-header {
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px dashed var(--border-glass);
+}
+
+.invite-envelope {
+    font-size: 3rem;
+    margin-bottom: 0.75rem;
+    animation: envelopeBounce 2s ease-in-out infinite;
+}
+
+@keyframes envelopeBounce {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    25% { transform: translateY(-8px) rotate(-5deg); }
+    75% { transform: translateY(-4px) rotate(5deg); }
+}
+
+.invite-title {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    color: var(--text-primary);
+    margin-bottom: 0.3rem;
+}
+
+.invite-subtitle {
+    font-family: var(--font-handwriting);
+    font-size: 1.3rem;
+    color: var(--pink-light);
+}
+
+.invite-details {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    margin-bottom: 2rem;
+}
+
+.invite-detail-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+    background: rgba(168, 85, 247, 0.05);
+    border: 1px solid var(--border-glass);
+    border-radius: var(--radius-md);
+    transition: var(--transition);
+    text-align: left;
+}
+
+.invite-detail-item:hover {
+    border-color: var(--border-hover);
+    background: rgba(168, 85, 247, 0.08);
+    transform: translateX(4px);
+}
+
+.invite-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--gradient-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    flex-shrink: 0;
+    box-shadow: 0 4px 15px var(--accent-glow);
+}
+
+.invite-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+}
+
+.invite-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.invite-value {
+    font-family: var(--font-handwriting);
+    font-size: 1.2rem;
+    color: var(--text-primary);
+}
+
+.invite-rsvp {
+    padding-top: 1.5rem;
+    border-top: 1px dashed var(--border-glass);
+}
+
+.rsvp-question {
+    font-family: var(--font-handwriting);
+    font-size: 1.4rem;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+}
+
+.rsvp-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.rsvp-status {
+    margin-top: 1rem;
+    font-family: var(--font-handwriting);
+    font-size: 1.2rem;
+    color: var(--accent-light);
+    min-height: 1.5rem;
+}
+
+/* ========================================
+   DATE BANNER (hero)
+   ======================================== */
+.date-banner {
+    margin-top: 1.5rem;
+    padding: 0.75rem 1.5rem;
+    background: var(--bg-card);
+    border: 1.5px solid var(--accent);
+    border-radius: var(--radius-xl);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    box-shadow: 0 0 20px var(--accent-glow);
+    animation: fadeInUp 0.8s ease-out, bannerGlow 2s ease-in-out infinite;
+}
+
+@keyframes bannerGlow {
+    0%, 100% { box-shadow: 0 0 15px var(--accent-glow); }
+    50% { box-shadow: 0 0 30px var(--accent-glow), 0 0 50px rgba(168, 85, 247, 0.1); }
+}
+
+.date-banner-icon {
+    font-size: 1.3rem;
+    animation: pickBounce 1.5s ease-in-out infinite;
+}
+
+.date-banner-text {
+    font-family: var(--font-handwriting);
+    font-size: 1.25rem;
+    color: var(--accent-light);
+}
 
 /* ========================================
    RESPONSIVE

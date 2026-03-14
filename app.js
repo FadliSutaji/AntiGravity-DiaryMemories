@@ -16,7 +16,7 @@ function initApp() {
     initMusic();
     initDiary();
     initGallery();
-
+    initVideo();
     initLightbox();
     initScrollAnimations();
 }
@@ -141,9 +141,11 @@ function initPinLock() {
         key.addEventListener('click', () => handleKey(key.dataset.key));
     });
 
-    // Keyboard support
+    // Keyboard support (skip when change PIN modal is open or input is focused)
     document.addEventListener('keydown', (e) => {
         if (lockScreen.style.display === 'none') return;
+        if (pinChangeModal.style.display !== 'none') return;
+        if (document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA')) return;
         if (e.key >= '0' && e.key <= '9') handleKey(e.key);
         if (e.key === 'Backspace') handleKey('del');
     });
@@ -195,15 +197,28 @@ function initPinLock() {
 }
 
 /* ========================================
-   MUSIC PLAYER
+   MUSIC PLAYER (2 local songs)
    ======================================== */
 function initMusic() {
     const audio = document.getElementById('bgMusic');
     const toggle = document.getElementById('musicToggle');
+    const switchBtn = document.getElementById('musicSwitch');
+    const picker = document.getElementById('songPicker');
+    const songOptions = document.querySelectorAll('.song-option');
     let isPlaying = false;
 
-    audio.volume = 0.3;
+    const songs = {
+        '1': 'music/lagu1.mp3',
+        '2': 'music/lagu2.mp3'
+    };
 
+    // Load saved song preference
+    let currentSong = localStorage.getItem('diary_song') || '1';
+    audio.src = songs[currentSong];
+    audio.volume = 0.3;
+    updateSongUI(currentSong);
+
+    // Play/Pause
     toggle.addEventListener('click', () => {
         if (isPlaying) {
             audio.pause();
@@ -214,6 +229,62 @@ function initMusic() {
         }
         isPlaying = !isPlaying;
     });
+
+    // Toggle song picker
+    switchBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        picker.classList.toggle('active');
+    });
+
+    // Close picker when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!picker.contains(e.target) && e.target !== switchBtn) {
+            picker.classList.remove('active');
+        }
+    });
+
+    // Song selection
+    songOptions.forEach(opt => {
+        opt.addEventListener('click', () => {
+            const songId = opt.dataset.song;
+            if (songId === currentSong) return;
+
+            currentSong = songId;
+            localStorage.setItem('diary_song', currentSong);
+            audio.src = songs[currentSong];
+            updateSongUI(currentSong);
+
+            if (isPlaying) {
+                audio.play().catch(() => { });
+            }
+
+            picker.classList.remove('active');
+            showToast(`Lagu ${currentSong} dipilih 🎵`);
+        });
+    });
+
+    function updateSongUI(id) {
+        songOptions.forEach(opt => {
+            opt.classList.toggle('active', opt.dataset.song === id);
+        });
+    }
+
+    // Expose music state for video integration
+    window._musicState = {
+        get isPlaying() { return isPlaying; },
+        pause() {
+            if (isPlaying) {
+                audio.pause();
+                toggle.classList.remove('playing');
+            }
+        },
+        resume() {
+            if (isPlaying) {
+                audio.play().catch(() => { });
+                toggle.classList.add('playing');
+            }
+        }
+    };
 }
 
 /* ========================================
@@ -265,6 +336,7 @@ function initDate() {
     el.textContent = new Date().toLocaleDateString('id-ID', {
         weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
     });
+    loadDatePick();
 }
 
 function formatDate(dateStr) {
@@ -544,6 +616,57 @@ function deletePhoto(id) {
 }
 
 
+/* ========================================
+   VIDEO RECAP (with music auto-pause)
+   ======================================== */
+function initVideo() {
+    const video = document.getElementById('recapVideo');
+    const overlay = document.getElementById('videoPlayOverlay');
+    if (!video || !overlay) return;
+
+    let musicWasPlaying = false;
+
+    // Click overlay to play
+    overlay.addEventListener('click', () => {
+        video.play().catch(() => { });
+        overlay.classList.add('hidden');
+    });
+
+    // Click video to toggle pause/play
+    video.addEventListener('click', () => {
+        if (video.paused) {
+            video.play();
+        } else {
+            video.pause();
+        }
+    });
+
+    // Video starts playing → pause music
+    video.addEventListener('play', () => {
+        if (window._musicState && window._musicState.isPlaying) {
+            musicWasPlaying = true;
+            window._musicState.pause();
+        }
+    });
+
+    // Video paused → resume music if it was playing
+    video.addEventListener('pause', () => {
+        if (musicWasPlaying && window._musicState) {
+            window._musicState.resume();
+            musicWasPlaying = false;
+        }
+    });
+
+    // Video ended → show overlay again, resume music
+    video.addEventListener('ended', () => {
+        overlay.classList.remove('hidden');
+        if (musicWasPlaying && window._musicState) {
+            window._musicState.resume();
+            musicWasPlaying = false;
+        }
+    });
+}
+
 
 /* ========================================
    LIGHTBOX
@@ -590,4 +713,92 @@ function initScrollAnimations() {
         .animate-on-scroll.visible { opacity: 1; transform: translateY(0); }
     `;
     document.head.appendChild(style);
+}
+
+/* ========================================
+   PICK NUMBER (28 or 29)
+   ======================================== */
+function pickNumber(num) {
+    const popup = document.getElementById('pickPopup');
+    const msg = document.getElementById('pickMsg');
+
+    // Save choice
+    localStorage.setItem('diary_date_pick', num);
+
+    msg.textContent = `Kamu pilih tanggal ${num}! Siap-siap ya beb 💜`;
+    popup.classList.add('active');
+    document.body.style.overflow = 'hidden';
+
+    // Show banner on hero
+    showDateBanner(num);
+}
+
+function closePickPopup() {
+    document.getElementById('pickPopup').classList.remove('active');
+    document.body.style.overflow = '';
+}
+
+function showDateBanner(num) {
+    const banner = document.getElementById('dateBanner');
+    const text = document.getElementById('dateBannerText');
+    if (banner && text) {
+        text.textContent = `Date kita tanggal ${num} ya beb! 💜`;
+        banner.style.display = 'inline-flex';
+    }
+
+    // Also update invitation date
+    const inviteDate = document.getElementById('inviteDate');
+    if (inviteDate) {
+        inviteDate.textContent = `Tanggal ${num} bulan ini 💜`;
+    }
+}
+
+// Load saved date pick on page load (called from initDate)
+function loadDatePick() {
+    const saved = localStorage.getItem('diary_date_pick');
+    if (saved) showDateBanner(saved);
+
+    // Load saved RSVP
+    const rsvp = localStorage.getItem('diary_rsvp');
+    if (rsvp) {
+        const status = document.getElementById('rsvpStatus');
+        if (status) {
+            status.textContent = rsvp === 'yes'
+                ? 'Kamu udah confirm dateng! 💜 See you beb!'
+                : 'Yaudah gapapa, tapi aku tetep nunggu ya 🥺';
+        }
+    }
+}
+
+/* ========================================
+   RSVP (Date Invitation)
+   ======================================== */
+function rsvpAnswer(answer) {
+    localStorage.setItem('diary_rsvp', answer);
+
+    const popup = document.getElementById('rsvpPopup');
+    const emoji = document.getElementById('rsvpEmoji');
+    const title = document.getElementById('rsvpTitle');
+    const msg = document.getElementById('rsvpMsg');
+    const status = document.getElementById('rsvpStatus');
+
+    if (answer === 'yes') {
+        emoji.textContent = '🥰';
+        title.textContent = 'Yeay! Makasih beb!';
+        msg.textContent = 'Aku udah ga sabar ketemu kamu! Siap-siap ya 💜';
+        if (status) status.textContent = 'Kamu udah confirm dateng! 💜 See you beb!';
+    } else {
+        emoji.textContent = '🥺';
+        title.textContent = 'Yahhh...';
+        msg.textContent = 'Gapapa beb, tapi aku tetep nunggu kamu ya... 🥺💜';
+        if (status) status.textContent = 'Yaudah gapapa, tapi aku tetep nunggu ya 🥺';
+    }
+
+    popup.classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeRsvpPopup() {
+    document.getElementById('rsvpPopup').classList.remove('active');
+    document.body.style.overflow = '';
 }

@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Ruang Hati — Diary pribadi, tempat curahan hati dan kenangan indah bersama">
-    <title>💜 Ruang Hati — Our Diary</title>
+    <title>💜 Ruang ak sayang km — diary fafa</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
@@ -47,7 +47,7 @@
                 <button class="pin-key pin-key-del" data-key="del">⌫</button>
             </div>
             <p class="lock-hint" id="lockHint">PIN : Tanggal smm bulan</p>
-            <button class="btn btn-secondary btn-sm" id="changePinBtn">Ubah PIN</button>
+            <button class="btn btn-secondary btn-sm" id="changePinBtn">Rasah diganti yo</button>
         </div>
 
         <!-- Change PIN Modal -->
@@ -79,19 +79,32 @@
                     <span class="bar"></span><span class="bar"></span><span class="bar"></span>
                 </span>
             </button>
+            <button class="music-switch" id="musicSwitch" title="Ganti Lagu">🔀</button>
+            <div class="song-picker" id="songPicker">
+                <p class="song-picker-title">🎶 Pilih Lagu</p>
+                <button class="song-option active" data-song="1" id="songOpt1">
+                    <span class="song-num">1</span>
+                    <span class="song-name">Galau bgt</span>
+                </button>
+                <button class="song-option" data-song="2" id="songOpt2">
+                    <span class="song-num">2</span>
+                    <span class="song-name">Lagu kita berdua 💜</span>
+                </button>
+            </div>
         </div>
 
         <!-- Navigation -->
         <nav class="navbar" id="navbar">
             <div class="nav-brand">
                 <span class="nav-icon">📖</span>
-                <span class="nav-title">Ruang Hati</span>
+                <span class="nav-title">Ruang aku sayang km</span>
             </div>
             <div class="nav-links">
                 <a href="#home" class="nav-link active" data-section="home">Beranda</a>
                 <a href="#diary" class="nav-link" data-section="diary">Diary</a>
                 <a href="#gallery" class="nav-link" data-section="gallery">Galeri</a>
-
+                <a href="#recap" class="nav-link" data-section="recap">Recap</a>
+                <a href="#invitation" class="nav-link" data-section="invitation">Undangan</a>
             </div>
             <div class="nav-right">
                 <button class="theme-toggle" id="themeToggle" title="Toggle Light/Dark">
@@ -108,6 +121,8 @@
             <a href="#home" class="mobile-link" data-section="home">Beranda</a>
             <a href="#diary" class="mobile-link" data-section="diary">Diary</a>
             <a href="#gallery" class="mobile-link" data-section="gallery">Galeri</a>
+            <a href="#recap" class="mobile-link" data-section="recap">Recap</a>
+            <a href="#invitation" class="mobile-link" data-section="invitation">Undangan</a>
 
         </div>
 
@@ -115,19 +130,25 @@
         <section class="hero" id="home">
             <div class="hero-overlay"></div>
             <div class="hero-content">
-                <p class="hero-label">✦ Our Personal Space ✦</p>
+                <p class="hero-label">✦ Ruang aku sayang km ✦</p>
                 <h1 class="hero-title">
                     <span class="title-line">Ruang</span>
                     <span class="title-line accent">Hati</span>
                     <span class="title-line small">Kita</span>
                 </h1>
                 <p class="hero-subtitle">
-                    Tempat kita menuangkan semua rasa, berdua. <br>
-                    Karena kadang, hati butuh ruang untuk bicara.
+                    Gemini tolong generate kata kata
+                    Baik! saya akan memberikan saran
+                    yang cocok, yaitu Tempat kita menuangkan semua rasa, berdua. <br>
+
                 </p>
                 <div class="hero-cta">
                     <a href="#diary" class="btn btn-primary">Tulis Diary 📝</a>
                     <a href="#gallery" class="btn btn-secondary">Galeri Foto 📸</a>
+                </div>
+                <div class="date-banner" id="dateBanner" style="display:none;">
+                    <span class="date-banner-icon">💜</span>
+                    <span class="date-banner-text" id="dateBannerText"></span>
                 </div>
                 <div class="hero-date">
                     <span id="currentDate"></span>
@@ -145,10 +166,9 @@
         <section class="section diary-section" id="diary">
             <div class="container">
                 <div class="section-header">
-                    <span class="section-tag">📝 Keluh Kesah Kita</span>
-                    <h2 class="section-title">Diary <span class="accent">Kita</span></h2>
-                    <p class="section-desc">Tempat kita berdua menuliskan semua yang dirasakan. Nggak apa-apa kalau
-                        ngerasa beda. 💜</p>
+                    <span class="section-tag">📝 Sambat, sharing, gosip</span>
+                    <h2 class="section-title">Diary <span class="accent">Fafa</span></h2>
+                    <p class="section-desc">Sebenernya aku si yg mw sharing hihiwww💜</p>
                 </div>
 
                 <!-- New Entry Form -->
@@ -171,9 +191,9 @@
                             </div>
                         </div>
                         <input type="text" class="diary-input-title" id="diaryTitle"
-                            placeholder="Judul ceritamu hari ini..." maxlength="100">
+                            placeholder="Judul ceritamu hari ini!" maxlength="100">
                         <textarea class="diary-textarea" id="diaryContent"
-                            placeholder="Ceritakan apa yang kamu rasakan... &#10;&#10;Nggak apa-apa kalau kamu ngerasa beda. Semua perasaan itu valid. 💜"
+                            placeholder="ak mw isiiii, &#10;&#10;Sebenernya aku si yg mw sharing hihiwww💜💜"
                             rows="6"></textarea>
                         <!-- Photo attachment in diary -->
                         <div class="diary-photo-attach">
@@ -202,16 +222,16 @@
         <section class="section gallery-section" id="gallery">
             <div class="container">
                 <div class="section-header">
-                    <span class="section-tag">📸 Kenangan Kita</span>
+                    <span class="section-tag">📸 Foto-foto gemayyy</span>
                     <h2 class="section-title">Galeri <span class="accent">Foto</span></h2>
-                    <p class="section-desc">Simpan momen-momen indah yang ingin kita kenang selamanya.</p>
+                    <p class="section-desc">Kumpulan foto gemayyyy</p>
                 </div>
 
                 <!-- Upload Area -->
                 <div class="upload-area glass-card" id="uploadArea">
                     <div class="upload-content">
                         <div class="upload-icon">📷</div>
-                        <h3>Tambah Foto Kenangan</h3>
+                        <h3>Tambah Foto gemayyyy</h3>
                         <p>Drag & drop foto di sini, atau klik untuk pilih</p>
                         <input type="file" id="photoInput" accept="image/*" multiple hidden>
                         <button class="btn btn-primary" id="uploadBtn">Pilih Foto</button>
@@ -237,18 +257,136 @@
         </section>
 
 
+        <!-- ===== VIDEO RECAP SECTION ===== -->
+        <section class="section video-section" id="recap">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-tag">🎬 Recap Kita</span>
+                    <h2 class="section-title">Love Should Be <span class="accent">Fun!</span></h2>
+                    <p class="section-desc">So yummyyy💜</p>
+                </div>
+
+                <div class="video-wrapper glass-card cute-card">
+                    <div class="cute-sticker cute-sticker-1">🎬</div>
+                    <div class="cute-sticker cute-sticker-2">💜</div>
+                    <div class="video-container" id="videoContainer">
+                        <video id="recapVideo" preload="metadata">
+                            <source src="music/recap.mp4" type="video/mp4">
+                            Browser kamu tidak mendukung video.
+                        </video>
+                        <div class="video-play-overlay" id="videoPlayOverlay">
+                            <div class="play-btn-circle">
+                                <svg width="32" height="32" viewBox="0 0 24 24" fill="white">
+                                    <polygon points="5,3 19,12 5,21" />
+                                </svg>
+                            </div>
+                            <p class="play-label">Tonton Recap Kita ▶</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== DATE INVITATION SECTION ===== -->
+        <section class="section invitation-section" id="invitation">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-tag">💌 You're Invited</span>
+                    <h2 class="section-title">Date <span class="accent">Invitation</span></h2>
+                    <p class="section-desc">Sebuah undangan spesial buat kamu 💜</p>
+                </div>
+
+                <div class="invitation-card glass-card cute-card">
+                    <div class="cute-sticker cute-sticker-1">💌</div>
+                    <div class="cute-sticker cute-sticker-2">🌸</div>
+
+                    <div class="invite-header">
+                        <div class="invite-envelope">💌</div>
+                        <h3 class="invite-title">Kamu diundang untuk...</h3>
+                        <p class="invite-subtitle">hangout bareng akuuu 💜</p>
+                    </div>
+
+                    <div class="invite-details">
+                        <div class="invite-detail-item">
+                            <div class="invite-icon">📅</div>
+                            <div class="invite-info">
+                                <span class="invite-label">Tanggal</span>
+                                <span class="invite-value" id="inviteDate">Pilih dulu di bawah ya! ⬇️</span>
+                            </div>
+                        </div>
+
+                        <div class="invite-detail-item">
+                            <div class="invite-icon">📍</div>
+                            <div class="invite-info">
+                                <span class="invite-label">Tempat</span>
+                                <span class="invite-value">Rahasia, nanti aku kasih tau 🤫</span>
+                            </div>
+                        </div>
+
+                        <div class="invite-detail-item">
+                            <div class="invite-icon">👗</div>
+                            <div class="invite-info">
+                                <span class="invite-label">Dresscode</span>
+                                <span class="invite-value">Yang penting cantik kayak biasa 💅</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="invite-rsvp">
+                        <p class="rsvp-question">Bisa dateng kan? 🥺</p>
+                        <div class="rsvp-buttons">
+                            <button class="btn btn-primary btn-glow" id="rsvpYes" onclick="rsvpAnswer('yes')">
+                                Iya dong! 💜
+                            </button>
+                            <button class="btn btn-secondary" id="rsvpNo" onclick="rsvpAnswer('no')">
+                                Hmm gatau 😢
+                            </button>
+                        </div>
+                        <p class="rsvp-status" id="rsvpStatus"></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== RSVP Popup ===== -->
+        <div class="pick-popup-overlay" id="rsvpPopup">
+            <div class="pick-popup-card glass-card">
+                <div class="pick-popup-emoji" id="rsvpEmoji">💜</div>
+                <h3 class="pick-popup-title" id="rsvpTitle"></h3>
+                <p class="pick-popup-msg" id="rsvpMsg"></p>
+                <button class="btn btn-primary btn-sm" onclick="closeRsvpPopup()">Oke beb 💜</button>
+            </div>
+        </div>
+
         <!-- ===== FOOTER ===== -->
         <footer class="footer">
             <div class="footer-content">
                 <div class="footer-quote">
-                    <p>"Kadang yang kita butuhkan bukan jawaban, tapi seseorang yang mau mendengarkan."</p>
+                    <p>"Kadang yang kita butuhkan istirahat, tapi seseorang yang mau beneran sabar bgt contohnya
+                        bububb akuu"</p>
+                    <p>butuh yanto barang sih beb? cobaakk pilihh angkaa 28 app 29</p>
+                    <div class="pick-buttons">
+                        <button class="btn-pick" id="pick28" onclick="pickNumber(28)">28</button>
+                        <span class="pick-or">atau</span>
+                        <button class="btn-pick" id="pick29" onclick="pickNumber(29)">29</button>
+                    </div>
                 </div>
                 <div class="footer-brand">
                     <span>💜 Ruang Hati — Our Diary</span>
                 </div>
-                <p class="footer-copy">Made with love & tears. 2024–2026</p>
+                <p class="footer-copy">1 years and still counting💜 2025–2026</p>
             </div>
         </footer>
+
+        <!-- Pick Number Popup -->
+        <div class="pick-popup-overlay" id="pickPopup">
+            <div class="pick-popup-card glass-card">
+                <div class="pick-popup-emoji">💜</div>
+                <h3 class="pick-popup-title">Makasih beb!</h3>
+                <p class="pick-popup-msg" id="pickMsg"></p>
+                <button class="btn btn-primary btn-sm" onclick="closePickPopup()">Oke sayang 💜</button>
+            </div>
+        </div>
 
     </div> <!-- /app-wrapper -->
 
@@ -264,9 +402,9 @@
     <!-- Toast -->
     <div class="toast-container" id="toastContainer"></div>
 
-    <!-- Background Music (royalty free chill LoFi) -->
+    <!-- Background Music -->
     <audio id="bgMusic" loop preload="auto">
-        <source src="https://cdn.pixabay.com/audio/2024/11/01/audio_4956b4edd1.mp3" type="audio/mpeg">
+        <source src="music/lagu1.mp3" type="audio/mpeg">
     </audio>
 
     <script src="app.js"></script>
