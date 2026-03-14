@@ -354,8 +354,6 @@ function initDiary() {
 
         showToast('Ceritamu tersimpan 📝');
         renderDiaryEntries();
-        // Auto refresh
-        setTimeout(() => window.location.reload(), 800);
     });
 
     // Load from Firestore on init (merge with local)
@@ -539,8 +537,6 @@ function initGallery() {
         resetGalleryForm();
         showToast('Foto tersimpan! 📸');
         renderGallery();
-        // Auto refresh
-        setTimeout(() => window.location.reload(), 800);
     });
 
     cancelBtn.addEventListener('click', resetGalleryForm);
